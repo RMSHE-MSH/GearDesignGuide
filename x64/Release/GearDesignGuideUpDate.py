@@ -32,7 +32,7 @@ def DownloadBlock(URL: str, file_name: str, file_path: str):
 
 if (os.path.exists('GearDesignGuide.exe') == False):
     print("[提示]正在启动安装程序...")
-    URL_GDG_EXE = "https://tmp-titan.vx-cdn.com/file-6357aafa2a4cb-6357ab9488c76/GearDesignGuide.exe"
+    URL_GDG_EXE = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuide.exe"
 
     if (DownloadBlock(URL_GDG_EXE, "GearDesignGuide.exe", "") == False):
         os.system("pause")

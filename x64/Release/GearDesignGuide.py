@@ -52,13 +52,13 @@ if (os.path.exists('GearDesignGuide.dll') == False):
     print("[致命错误]GearDesignGuide.dll核心组件不存在.")
     QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll核心组件不存在.')
 
-    URL_GDG_DLL = "https://gitee.com/rmshe/GearDesignGuide/raw/master/x64/Release/GearDesignGuide.dll"
+    URL_GDG_DLL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuide.dll"
 
     if (DownloadBlock(URL_GDG_DLL, "GearDesignGuide.dll", "") == False):
         os.system("pause")
         sys.exit()
 
-URL_IMGDATA = "https://gitee.com/rmshe/GearDesignGuide/raw/master/x64/Release/IMGDATA/"
+URL_IMGDATA = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/tree/master/x64/Release/IMGDATA"
 NAME_IMGDATA = [
     "P203_10-1.png", "P205_10-2.png", "P207_10-3.png", "P208_10-4.png",
     "P213_10-6.png", "P216_10-7.png", "P216_10-8.png", "P218_10-18.png",
