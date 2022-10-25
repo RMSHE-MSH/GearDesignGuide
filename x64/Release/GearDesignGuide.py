@@ -21,18 +21,58 @@ window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
 window.show()
 app.exec_()
 
-if (os.path.exists('GearDesignGuide.dll') == False):
-    print("[致命错误]GearDesignGuide.dll核心组件不存在.")
-    QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll核心组件不存在.')
-    os.system("GearDesignGuideUpDate.exe")
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77'
+}
+
+UpDateExe_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuideUpDate.exe"
+
+
+def DownloadModule(URL: str, file_name: str, file_path: str):
+    sleep(1)
+    print(f"[提示]正在尝试访问({URL})")
+    rf = requests.get(URL,  headers)
+    if (rf.status_code == 200):
+        print(f"[提示]正在下载组件({file_name})...")
+    else:
+        print(f"[错误]无法访问服务器({rf})")
+        return False
+
+    with open(file_path, "wb") as code:
+        code.write(rf.content)
+    rf.close()
+
+    if (os.path.exists(file_path) == False):
+        print(f"[错误]组件下载失败({file_path})")
+        return False
+    else:
+        print(f"[提示]组件已下载({file_path})")
+        return True
+
+
+def Module_Self_Test(file_name: str, file_path: str):
+    if (os.path.exists(file_path) == False):
+        print(f"[错误]组件不存在({file_name})")
+        QMessageBox.critical(window, '错误', f'组件不存在({file_name})')
+
+        if (file_name == "GearDesignGuideUpDate.exe"):
+            if (DownloadModule(UpDateExe_URL, file_name, file_path) == False):
+                os.system("pause")
+                sys.exit()
+        else:
+            os.system("GearDesignGuideUpDate.exe")
+
+
+Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+Module_Self_Test("GearDesignGuide.dll", "./GearDesignGuide.dll")
 
 Resource = (
     "P203_10-1.png", "P205_10-2.png", "P207_10-3.png", "P208_10-4.png", "P213_10-6.png", "P216_10-7.png",
     "P216_10-8.png", "P218_10-18.png", "P218_10-19.png", "P219_10-20.png", "P221_10-21.png"
 )
 for name in Resource:
-    if (os.path.exists(f'./Resource/{name}') == False):
-        os.system("GearDesignGuideUpDate.exe")
+    Module_Self_Test(name,f"./Resource/{name}")
+
 
 
 MathDll = CDLL("./GearDesignGuide.dll")
