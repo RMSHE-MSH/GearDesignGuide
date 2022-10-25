@@ -21,58 +21,18 @@ window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
 window.show()
 app.exec_()
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77'
-}
-
-
-def DownloadBlock(URL: str, file_name: str, file_path: str):
-    sleep(1)
-    print(f"[下载]正在尝试从({URL})下载{file_name}")
-    rf = requests.get(URL, headers)
-    if (rf.status_code == 200):
-        print(rf, "\n[提示]成功连接服务器,正在下载必要组件...")
-    else:
-        print(rf, "\n[错误]无法连接服务器")
-        return False
-
-    with open(file_path+file_name, "wb") as code:
-        code.write(rf.content)
-    rf.close()
-
-    if (os.path.exists(file_path+file_name) == False):
-        print(f"[致命错误]{file_path+file_name}不存在, 下载失败.")
-        return False
-    else:
-        print(f"[提示]{file_path+file_name}组件已下载.")
-        return True
-
-
 if (os.path.exists('GearDesignGuide.dll') == False):
     print("[致命错误]GearDesignGuide.dll核心组件不存在.")
     QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll核心组件不存在.')
+    os.system("GearDesignGuideUpDate.exe")
 
-    URL_GDG_DLL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuide.dll"
-
-    if (DownloadBlock(URL_GDG_DLL, "GearDesignGuide.dll", "") == False):
-        os.system("pause")
-        sys.exit()
-
-URL_IMGDATA = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/tree/master/x64/Release/IMGDATA"
-NAME_IMGDATA = [
-    "P203_10-1.png", "P205_10-2.png", "P207_10-3.png", "P208_10-4.png",
-    "P213_10-6.png", "P216_10-7.png", "P216_10-8.png", "P218_10-18.png",
-    "P218_10-19.png", "P219_10-20.png", "P221_10-21.png"
-]
-for i in range(11):
-    if (os.path.exists(f'./IMGDATA/{NAME_IMGDATA[i]}') == False):
-        print(f"\n[错误]{NAME_IMGDATA[i]}资源不存在.")
-        if (os.path.exists('./IMGDATA') == False):
-            os.mkdir('./IMGDATA')
-
-        if (DownloadBlock(URL_IMGDATA+NAME_IMGDATA[i], NAME_IMGDATA[i], "./IMGDATA/") == False):
-            os.system("pause")
-            sys.exit()
+Resource = (
+    "P203_10-1.png", "P205_10-2.png", "P207_10-3.png", "P208_10-4.png", "P213_10-6.png", "P216_10-7.png",
+    "P216_10-8.png", "P218_10-18.png", "P218_10-19.png", "P219_10-20.png", "P221_10-21.png"
+)
+for name in Resource:
+    if (os.path.exists(f'./Resource/{name}') == False):
+        os.system("GearDesignGuideUpDate.exe")
 
 
 MathDll = CDLL("./GearDesignGuide.dll")

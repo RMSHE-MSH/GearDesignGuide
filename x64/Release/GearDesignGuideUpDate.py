@@ -7,15 +7,26 @@ headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77'
 }
 
+Module = {
+    "GearDesignGuide.exe": "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuide.exe",
+    "GearDesignGuide.dll": "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuide.dll",
+}
 
-def DownloadBlock(URL: str, file_name: str, file_path: str):
+Resource_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/tree/master/x64/Release/Resource"
+Resource = (
+    "P203_10-1.png", "P205_10-2.png", "P207_10-3.png", "P208_10-4.png", "P213_10-6.png", "P216_10-7.png",
+    "P216_10-8.png", "P218_10-18.png", "P218_10-19.png", "P219_10-20.png", "P221_10-21.png"
+)
+
+
+def DownloadModule(URL: str, file_name: str, file_path: str):
     sleep(1)
-    print(f"[下载]正在尝试从({URL})下载{file_name}")
+    print(f"\n[提示]正在尝试访问({URL})")
     rf = requests.get(URL, headers)
     if (rf.status_code == 200):
-        print(rf, "\n[提示]成功连接服务器,正在下载必要组件...")
+        print(f"[提示]正在下载组件({file_name})...")
     else:
-        print(rf, "\n[错误]无法连接服务器")
+        print(f"[错误]无法访问服务器({rf})")
         return False
 
     with open(file_path+file_name, "wb") as code:
@@ -23,23 +34,34 @@ def DownloadBlock(URL: str, file_name: str, file_path: str):
     rf.close()
 
     if (os.path.exists(file_path+file_name) == False):
-        print(f"[致命错误]{file_path+file_name}下载失败.")
+        print(f"[错误]组件下载失败({file_path+file_name})")
         return False
     else:
-        print(f"[提示]{file_path+file_name}组件已下载.")
+        print(f"[提示]组件已下载({file_path+file_name})")
         return True
 
 
-if (os.path.exists('GearDesignGuide.exe') == False):
-    print("[提示]正在启动安装程序...")
-    URL_GDG_EXE = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuide.exe"
+for name in Module:
+    if (os.path.exists(name) == False):
+        print(f"[提示]正在准备部署({name})")
 
-    if (DownloadBlock(URL_GDG_EXE, "GearDesignGuide.exe", "") == False):
-        os.system("pause")
-        sys.exit()
-    else:
-        os.system("GearDesignGuide.exe")
-else:
-    os.system("GearDesignGuide.exe")
+        if (DownloadModule(Module[name], name, "") == False):
+            os.system("pause")
+            sys.exit()
+
+
+for name in Resource:
+    if (os.path.exists(f'./Resource/{name}') == False):
+        print(f"[提示]正在准备部署({name})")
+
+        if (os.path.exists('./Resource') == False):
+            os.mkdir('./Resource')
+
+        if (DownloadModule(Resource_URL, name, "./Resource/") == False):
+            os.system("pause")
+            sys.exit()
+
+
+os.system("GearDesignGuide.exe")
 
 # Pyinstaller -F -i LOGO1.ico GearDesignGuideUpDate.py

@@ -102,7 +102,7 @@ GEARMATH_API HWND c_initgraph(int width, int height, COLORREF color) {
 GEARMATH_API void c_ShowIMGDATA(char *name) {
 	string DllPATH = GetCurrentModule();
 	string EXEPATH = DllPATH.substr(0, DllPATH.length() - 19);
-	string IMGPATH = EXEPATH + "IMGDATA\\" + string(name) + ".png";
+	string IMGPATH = EXEPATH + "Resource\\" + string(name) + ".png";
 
 	////从文件中读入图像
 	//Mat img = imread(IMGPATH, 1);
