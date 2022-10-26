@@ -3,7 +3,7 @@ import os
 import sys
 from time import sleep
 
-print("GearDesignGuideUpDate - Powered by RMSHE")
+print("GearDesignGuideUpDate - Powered by RMSHE\n")
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77'
@@ -13,7 +13,12 @@ Module = {
     "GearDesignGuide.exe": "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/",
     "GearDesignGuide.dll": "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/",
 }
-UpDateInfo_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GDGUpDateInfo.ini"
+
+UpDateInfo_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GDGUpDateInfo.ini?inline=false"
+GDGUpDateInfo_Path = "./GDGUpDateInfo.ini"
+GDGUpDateInfo_OldDate = ["GearDesignGuide.exe.2022.10.26.Mark0", "GearDesignGuide.dll.2022.10.26.Mark0", "Resource.2022.10.26.Mark0"]
+GDGUpDateInfo_NewDate = ["GearDesignGuide.exe.2022.10.26.Mark0", "GearDesignGuide.dll.2022.10.26.Mark0", "Resource.2022.10.26.Mark0"]
+
 Resource_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/Resource/"
 Resource = (
     "P203_10-1.png", "P205_10-2.png", "P207_10-3.png", "P208_10-4.png", "P213_10-6.png", "P216_10-7.png",
@@ -21,10 +26,9 @@ Resource = (
 )
 
 
-def DownloadModule(URL: str, file_name: str, file_path: str, Mode: str = "Download"):
-    sleep(1)
-    if (Mode == "Download"):
-        print(f"[提示]正在下载组件({file_name})")
+def DownloadModule(URL: str, file_name: str, file_path: str):
+    sleep(2)
+    print(f"[提示]正在下载组件({file_name})")
 
     rf = requests.get(URL,  headers)
     if (rf.status_code != 200):
@@ -36,14 +40,10 @@ def DownloadModule(URL: str, file_name: str, file_path: str, Mode: str = "Downlo
     rf.close()
 
     if (os.path.exists(file_path) == False):
-        if (Mode == "Download"):
-            print(f"[错误]组件下载失败({file_path})")
-        else:
-            print(f"[错误]无法下载更新引导({file_path})")
+        print(f"[错误]组件下载失败({file_path})")
         return False
     else:
-        if (Mode == "Download"):
-            print(f"[提示]组件已下载({file_path})")
+        print(f"[提示]组件已下载({file_path})")
         return True
 
 
@@ -59,30 +59,49 @@ def del_files(path_file):
             os.remove(f_path)
 
 
-# 更新UpDateInfo(更新信息),并检查那些组件需要更新
-if (os.path.exists('GDGUpDateInfo.ini') == True):
-    os.remove('GDGUpDateInfo.ini')
-
-if (DownloadModule(UpDateInfo_URL, "./GDGUpDateInfo.ini", "UpDate") == True):
+# 读取ini文件;
+def Read_ini(file_path: str):
     # Open file
-    fileHandler = open("GDGUpDateInfo.ini",  "r")
+    fileHandler = open(file_path,  "r")
     # Get list of all lines in file
     listOfLines = fileHandler.readlines()
     # Close file
     fileHandler.close()
 
-    # Iterate over the lines
+    return listOfLines
+
+
+# 更新UpDateInfo(更新信息),并检查那些组件需要更新
+if (os.path.exists('GDGUpDateInfo.ini') == True):
+    # 读取旧的组件版本信息
+    listOfLines = Read_ini(GDGUpDateInfo_Path)
+    GDGUpDateInfo_OldDate.clear()
+    for line in listOfLines:
+        OldUpDate = line.strip()
+        GDGUpDateInfo_OldDate.append(OldUpDate)
+
+    # 删除旧的组件版本信息
+    os.remove('GDGUpDateInfo.ini')
+
+# 如果GDGUpDateInfo.ini下载成功,则开始检测那些组件需要更新
+if (DownloadModule(UpDateInfo_URL, "GDGUpDateInfo.ini", GDGUpDateInfo_Path) == True):
+    listOfLines = Read_ini(GDGUpDateInfo_Path)
+
+    # 对比新旧组件版本信息
+    GDGUpDateInfo_NewDate.clear()
     for line in listOfLines:
         UpDate = line.strip()
-        if (UpDate == "UpDate GearDesignGuide.exe"):
-            os.remove('GearDesignGuide.exe')
-        if (UpDate == "UpDate GearDesignGuide.dll"):
-            os.remove('GearDesignGuide.dll')
-        if (UpDate == "UpDate Resource"):
-            del_files("./Resource/")
+        GDGUpDateInfo_NewDate.append(UpDate)
 
-if (os.path.exists('GDGUpDateInfo.ini') == True):
-    os.remove('GDGUpDateInfo.ini')
+    if (GDGUpDateInfo_NewDate[0] != GDGUpDateInfo_OldDate[0] and os.path.exists('GearDesignGuide.exe') == True):
+        os.remove('GearDesignGuide.exe')
+
+    if (GDGUpDateInfo_NewDate[1] != GDGUpDateInfo_OldDate[1] and os.path.exists('GearDesignGuide.dll') == True):
+        os.remove('GearDesignGuide.dll')
+
+    if (GDGUpDateInfo_NewDate[2] != GDGUpDateInfo_OldDate[2] and os.path.exists('./Resource/') == True):
+        del_files("./Resource/")
+
 
 # 检查GearDesignGuide.exe与GearDesignGuide.dll时候存在,不存在则下载
 for name in Module:
@@ -107,6 +126,16 @@ for name in Resource:
             os.system("pause")
             sys.exit()
 
+
+# 创建一个text文件(路径,文件内容)
+def text_create(path, msg):
+    file = open(path, 'w')
+    file.write(msg)
+    file.close()
+
+
+if (os.path.exists('./GDGSetUp.ini') == False):
+    text_create('./GDGSetUp.ini', 'UpdateCompleted')
 
 os.system("GearDesignGuide.exe")
 

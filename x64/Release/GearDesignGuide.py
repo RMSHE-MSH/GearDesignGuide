@@ -20,10 +20,9 @@ headers = {
 UpDateExe_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuideUpDate.exe"
 
 
-def DownloadModule(URL: str, file_name: str, file_path: str, Mode: str = "Download"):
-    sleep(1)
-    if (Mode == "Download"):
-        print(f"[提示]正在下载组件({file_name})")
+def DownloadModule(URL: str, file_name: str, file_path: str):
+    sleep(2)
+    print(f"[提示]正在下载组件({file_name})")
 
     rf = requests.get(URL,  headers)
     if (rf.status_code != 200):
@@ -35,15 +34,23 @@ def DownloadModule(URL: str, file_name: str, file_path: str, Mode: str = "Downlo
     rf.close()
 
     if (os.path.exists(file_path) == False):
-        if (Mode == "Download"):
-            print(f"[错误]组件下载失败({file_path})")
-        else:
-            print(f"[错误]无法下载更新引导({file_path})")
+        print(f"[错误]组件下载失败({file_path})")
         return False
     else:
-        if (Mode == "Download"):
-            print(f"[提示]组件已下载({file_path})")
+        print(f"[提示]组件已下载({file_path})")
         return True
+
+
+# 读取ini文件;
+def Read_ini(file_path: str):
+    # Open file
+    fileHandler = open(file_path,  "r")
+    # Get list of all lines in file
+    listOfLines = fileHandler.readlines()
+    # Close file
+    fileHandler.close()
+
+    return listOfLines
 
 
 def Module_Self_Test(file_name: str, file_path: str):
@@ -56,21 +63,35 @@ def Module_Self_Test(file_name: str, file_path: str):
                 os.system("pause")
                 sys.exit()
         else:
-            os.system("GearDesignGuideUpDate.exe")
+            os.startfile(r"GearDesignGuideUpDate.exe")
+            sys.exit()
     else:
-        os.system("GearDesignGuideUpDate.exe")
+        os.startfile(r"GearDesignGuideUpDate.exe")
+        sys.exit()
 
 
-Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+if (os.path.exists('./GDGSetUp.ini') == True):
+    listOfLines = Read_ini("./GDGSetUp.ini")
+    for line in listOfLines:
+        SetUp = line.strip()
+
+        if (SetUp != "UpdateCompleted"):
+            print(SetUp)
+            Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+else:
+    Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+
+os.remove('GDGSetUp.ini')
+
 
 app = QApplication([])
 window = QMainWindow()
-window.resize(500, 400)
-window.move(300, 300)
-window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
+#window.resize(500, 400)
+#window.move(300, 300)
+#window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
 
-window.show()
-app.exec_()
+# window.show()
+# app.exec_()
 
 """
 Module_Self_Test("GearDesignGuide.dll", "./GearDesignGuide.dll")
@@ -497,7 +518,12 @@ def ShowIMGDATA(ImgName):
     """
 
 
+def closegraph():
+    MathDll.c_closegraph()
+
 # 线性插值(需插值的x坐标,两端基点坐标)将输出x对应的y坐标
+
+
 def Linear_interpolation(x, x0, y0, x1, y1):
     MathDll.c_Linear_interpolation.restype = c_double
     return MathDll.c_Linear_interpolation(c_double(x), c_double(x0), c_double(y0), c_double(x1), c_double(y1))
@@ -510,9 +536,9 @@ def rounding(f):
 
 # 当DataMode为True时,程序会略过所有的输入和查表过程,直接批量读取"InputData.csv"中的预设数据进行计算
 DataMode = Bulk and os.path.exists('InputData.csv')
-
-if (DataMode == True):
-    InputBulkData()
+if (os.path.exists('InputData.csv')==True):
+    if ("Y"==input("检测到批量数据\"InputData\". 是否导入? (导入输入:Y / 不导入输入:N)") and DataMode == True):
+        InputBulkData()
 
 
 if (DataMode == False or GearData.InputPower == None):
@@ -531,6 +557,7 @@ if (DataMode == False or GearData.Level == None):
     print("\n>[查P216/10-7]确定齿轮精度等级")
     ShowIMGDATA("P216_10-7")
     GearData.Level = eval(input("齿轮精度等级: "))
+    closegraph()
 
 if (DataMode == False or GearData.Material1 == "" or GearData.Material2 == "" or GearData.G1Hardness == "" or GearData.G2Hardness == ""):
     print("\n>[查P203_10-1]选择两轮材料和热处理方式")
@@ -546,6 +573,7 @@ if (DataMode == False or GearData.Material1 == "" or GearData.Material2 == "" or
         GearData.Material2 = input("大轮材料与热处理方式: ")
     if (GearData.G2Hardness == ""):
         GearData.G2Hardness = str(input("大轮齿面硬度(HB/HR/HV): "))
+    closegraph()
 
 if (DataMode == False or GearData.z1_ima == None):
     GearData.z1_ima = eval(input("初选小轮齿数: "))
@@ -566,6 +594,7 @@ if (DataMode == False or GearData.PHI_d == None):
     print("\n>[查P216/10-8]选择齿宽系数Φd")
     ShowIMGDATA("P216_10-8")
     GearData.PHI_d = eval(input("齿宽系数Φd: "))
+    closegraph()
 # 区域系数ZH为
 GearData.ZH = sqrt(2 / (cos(pi / 180 * GearData.AlphaN) * sin(pi / 180 * GearData.AlphaN)))
 # [查P213/10-6]确定弹性影响系数ZE
@@ -574,6 +603,7 @@ if (DataMode == False or GearData.ZE == None):
     print(f"小轮材料与热处理方式 = {GearData.Material1}\n大轮材料与热处理方式 = {GearData.Material2}")
     ShowIMGDATA("P213_10-6")
     GearData.ZE = eval(input("弹性影响系数ZE: "))
+    closegraph()
 # 重合度系数Zepsilon为
 Alpha_a1 = acos((GearData.z1_ima * cos(pi / 180 * GearData.AlphaN)) / (GearData.z1_ima + 2))
 Alpha_a2 = acos((GearData.z2_ima * cos(pi / 180 * GearData.AlphaN)) / (GearData.z2_ima + 2))
@@ -591,6 +621,7 @@ if (DataMode == False or GearData.sigmaHlim1 == None or GearData.sigmaHlim2 == N
         GearData.sigmaHlim1 = eval(input("小轮接触疲劳极限σHlim1: "))
     if (GearData.sigmaHlim2 == None):
         GearData.sigmaHlim2 = eval(input("大轮接触疲劳极限σHlim2: "))
+    closegraph()
 
 # 计算应力循环次数N
 GearData.N1 = 60 * GearData.n1 * 1 * GearData.Lh
@@ -604,6 +635,8 @@ if (DataMode == False or GearData.KHN1 == None or GearData.KHN2 == None):
         GearData.KHN1 = eval(input("小轮接触疲劳寿命系数KHN1: "))
     if (GearData.KHN2 == None):
         GearData.KHN2 = eval(input("大轮接触疲劳寿命系数KHN2: "))
+    closegraph()
+
 # 取安全系数SafeH=1,计算最小接触疲劳许用应力sigmaH
 SafeH = 1
 sigmaH1 = GearData.KHN1 * GearData.sigmaHlim1 / SafeH
@@ -626,6 +659,7 @@ if (DataMode == False or GearData.KHA == None):
     print("\n>[查P205/10-2]确定使用系数KHA")
     ShowIMGDATA("P205_10-2")
     GearData.KHA = eval(input("使用系数KHA: "))
+    closegraph()
 
 
 # [查P206/10-8]确定动载系数KHV
@@ -637,6 +671,7 @@ if (DataMode == False and GearData.KHV == None):
     print(f"小轮圆周速度: v = {GearData.V1_H:.3f} m/s;\t齿轮精度等级 = {GearData.Level};")
     ShowIMGDATA("P206_10-8")
     GearData.KHV = eval(input("动载系数KHV: "))
+    closegraph()
 
 
 # [查P207/10-3]确定齿间载荷分配系数KHalpha
@@ -700,6 +735,7 @@ if (DataMode == False and GearData.KHAlpha == None):
         print(f"(KA*Ft)/b = {GearData.NULL1:.1f} < 100 N/mm")
     ShowIMGDATA("P207_10-3")
     GearData.KHAlpha = eval(input("齿间载荷分配系数KHalpha: "))
+    closegraph()
 
 # [查P208/10-4]确定齿向载荷分布系数KHbeta(线性插值)
 if (DataMode == False or GearData.KHbeta == None):
@@ -707,6 +743,7 @@ if (DataMode == False or GearData.KHbeta == None):
     print(f"齿宽系数: Φd = {GearData.PHI_d};\t小轮齿宽: b = {GearData.b1_H:.3f} mm;\t齿轮精度等级 = {GearData.Level};")
     ShowIMGDATA("P208_10-4")
     GearData.KHbeta = eval(input("齿向载荷分布系数KHbeta: "))
+    closegraph()
 # 实际载荷系数KH_rel为
 GearData.KH_rel = GearData.KHA * GearData.KHV * GearData.KHAlpha * GearData.KHbeta
 
@@ -780,6 +817,7 @@ if (DataMode == False or GearData.sigmaFlim1 == None or GearData.sigmaFlim2 == N
         GearData.sigmaFlim1 = eval(input("小轮齿根弯曲疲劳极限σFlim1(MPa): "))  # (MPa)
     if (GearData.sigmaFlim2 == None):
         GearData.sigmaFlim2 = eval(input("大轮齿根弯曲疲劳极限σFlim2(MPa): "))  # (MPa)
+    closegraph()
 
 # [查P218/10-18]确定弯曲疲劳寿命系数KFN
 if (DataMode == False or GearData.KFN1 == None or GearData.KFN2 == None):
@@ -790,6 +828,7 @@ if (DataMode == False or GearData.KFN1 == None or GearData.KFN2 == None):
         GearData.KFN1 = eval(input("小轮弯曲疲劳寿命系数KFN1: "))
     if (GearData.KFN2 == None):
         GearData.KFN2 = eval(input("大轮弯曲疲劳寿命系数KFN2: "))
+    closegraph()
 
 # 取弯曲疲劳安全系数S=1.4, 计算弯曲疲劳许用应力
 if (DataMode == False or GearData.SafeF == None):
@@ -833,6 +872,7 @@ if (DataMode == False and GearData.KFV == None):
     print(f"小轮圆周速度: v = {GearData.VF_test:.3f} m/s;\t齿轮精度等级 = {GearData.Level};")
     ShowIMGDATA("P206_10-8")
     GearData.KFV = eval(input("动载系数KFV: "))
+    closegraph()
 
 # [查P207/10-3]确定齿间载荷分配系数KFalpha
 KFA = GearData.KHA
@@ -849,6 +889,7 @@ if (DataMode == False and GearData.KFAlpha == None):
 
     ShowIMGDATA("P207_10-3")
     GearData.KFAlpha = eval(input("齿间载荷分配系数KFalpha: "))
+    closegraph()
 
 # [查P208/10-13]确定弯曲强度计算的齿向载荷分布系数KFbeta
 MathDll.AutoGetKFbeta.restype = c_double
@@ -859,6 +900,7 @@ if (DataMode == False and GearData.KFbeta == None):
     print(f"齿向载荷分布系数: KHbeta = {GearData.KHbeta:.3f};\tb/h = {GearData.NULL3:.3f};")
     ShowIMGDATA("P208_10-13")
     GearData.KFbeta = eval(input("齿向载荷分布系数KFbeta: "))
+    closegraph()
 
 # 计算实际载荷系数KF
 GearData.KF = KFA * GearData.KFV * GearData.KFAlpha * GearData.KFbeta
@@ -870,6 +912,10 @@ GearData.d1F = GearData.mF * GearData.z1_ima
 # [对比计算结果]----------------------------------------
 GearData.m_rel = GearData.mF
 GearData.d1_rel = GearData.d1H_rel
+
+print("\n>>[接触疲劳与弯曲疲劳对比报告]----------------------------------------")
+print(f"按接触疲劳设计结果:\tmH = {GearData.mH:.3f} mm;\t d1H = {GearData.d1H_rel:.3f} mm;")
+print(f"按弯曲疲劳设计结果:\tmF = {GearData.mF:.3f} mm;\t d1F = {GearData.d1F:.3f} mm;")
 
 # [计算几何尺寸]
 
@@ -883,6 +929,7 @@ if (DataMode == False and GearData.m == None):
     print(f"请根据渐开线圆柱齿轮模数系列就近圆整计算模数;\t当前计算模数 = {GearData.m_rel:.3f};")
     ShowIMGDATA("GB_T_1357_1987")
     GearData.m = eval(input("圆整模数m: "))
+    closegraph()
 
 GearData.z1_rel = (GearData.d1_rel / GearData.m)
 GearData.z2_rel = (GearData.u_ima * (GearData.d1_rel / GearData.m))
@@ -905,7 +952,7 @@ GearData.z1_rel = int(Decimal(str(GearData.z1_rel)).quantize(Decimal('0'), round
 GearData.z2_rel = int(Decimal(str(GearData.z2_rel)).quantize(Decimal('0'), rounding=ROUND_HALF_UP))
 # 如果齿数不互质则重新手动指定两轮齿数
 if (coprime(GearData.z1_rel, GearData.z2_rel) == False):
-    print(f"小轮齿数: z1 = {GearData.z1_rel};\t大轮齿数: z2 = {GearData.z2_rel};\n[提示] 两齿轮齿数没有互质!请调整(如不调整则输入原值): ")
+    print(f"小轮齿数: z1 = {GearData.z1_rel};\t大轮齿数: z2 = {GearData.z2_rel};\n[提示] 两齿轮齿数没有互质!请圆整(如不调整则输入原值): ")
     GearData.z1_rel = eval(input("新的小轮齿数z1: "))
     GearData.z2_rel = eval(input("新的大轮齿数z2: "))
 
@@ -1170,4 +1217,4 @@ elif (ReportMode == "D" or ReportMode == "d"):
 
 os.system("pause")
 
-# Pyinstaller -F -i LOGO1.ico GearDesignGuide.py
+# Pyinstaller -F -i LOGO_CORE.ico GearDesignGuide.py

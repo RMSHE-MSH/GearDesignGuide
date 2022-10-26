@@ -101,6 +101,8 @@ GEARMATH_API HWND c_initgraph(int width, int height, COLORREF color) {
 	return hWnd;
 }
 
+GEARMATH_API void c_closegraph() { closegraph(); }
+
 //œ‘ æÕº∆¨;
 GEARMATH_API void c_ShowIMGDATA(char *name) {
 	string DllPATH = GetCurrentModule();
