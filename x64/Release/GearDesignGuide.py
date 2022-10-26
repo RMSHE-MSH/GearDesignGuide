@@ -19,6 +19,15 @@ headers = {
 
 UpDateExe_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuideUpDate.exe"
 
+app = QApplication([])
+window = QMainWindow()
+#window.resize(500, 400)
+#window.move(300, 300)
+#window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
+
+# window.show()
+# app.exec_()
+
 
 def DownloadModule(URL: str, file_name: str, file_path: str):
     sleep(2)
@@ -62,6 +71,9 @@ def Module_Self_Test(file_name: str, file_path: str):
             if (DownloadModule(UpDateExe_URL, file_name, file_path) == False):
                 os.system("pause")
                 sys.exit()
+            else:
+                os.startfile(r"GearDesignGuideUpDate.exe")
+                sys.exit()
         else:
             os.startfile(r"GearDesignGuideUpDate.exe")
             sys.exit()
@@ -76,22 +88,11 @@ if (os.path.exists('./GDGSetUp.ini') == True):
         SetUp = line.strip()
 
         if (SetUp != "UpdateCompleted"):
-            print(SetUp)
             Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
 else:
     Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
 
 os.remove('GDGSetUp.ini')
-
-
-app = QApplication([])
-window = QMainWindow()
-#window.resize(500, 400)
-#window.move(300, 300)
-#window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
-
-# window.show()
-# app.exec_()
 
 """
 Module_Self_Test("GearDesignGuide.dll", "./GearDesignGuide.dll")
@@ -536,9 +537,10 @@ def rounding(f):
 
 # 当DataMode为True时,程序会略过所有的输入和查表过程,直接批量读取"InputData.csv"中的预设数据进行计算
 DataMode = Bulk and os.path.exists('InputData.csv')
-if (os.path.exists('InputData.csv')==True):
-    if ("Y"==input("检测到批量数据\"InputData\". 是否导入? (导入输入:Y / 不导入输入:N)") and DataMode == True):
+if (os.path.exists('InputData.csv') == True):
+    if ("Y" == input("[提示]检测到批量数据\"InputData\": 是否导入? (导入输入:Y / 不导入输入:N) >>") and DataMode == True):
         InputBulkData()
+        print("\n")
 
 
 if (DataMode == False or GearData.InputPower == None):

@@ -26,6 +26,22 @@ Resource = (
 )
 
 
+# 创建一个text文件(路径,文件内容)
+def text_create(path, msg):
+    file = open(path, 'w')
+    file.write(msg)
+    file.close()
+
+
+# 启动主程序
+def SetUpMainProgram():
+    if (os.path.exists('./GDGSetUp.ini') == False):
+        text_create('./GDGSetUp.ini', 'UpdateCompleted')
+
+    os.system("GearDesignGuide.exe")
+
+
+# 下载组件
 def DownloadModule(URL: str, file_name: str, file_path: str):
     sleep(2)
     print(f"[提示]正在下载组件({file_name})")
@@ -71,72 +87,70 @@ def Read_ini(file_path: str):
     return listOfLines
 
 
-# 更新UpDateInfo(更新信息),并检查那些组件需要更新
-if (os.path.exists('GDGUpDateInfo.ini') == True):
-    # 读取旧的组件版本信息
-    listOfLines = Read_ini(GDGUpDateInfo_Path)
-    GDGUpDateInfo_OldDate.clear()
-    for line in listOfLines:
-        OldUpDate = line.strip()
-        GDGUpDateInfo_OldDate.append(OldUpDate)
-
-    # 删除旧的组件版本信息
-    os.remove('GDGUpDateInfo.ini')
-
-# 如果GDGUpDateInfo.ini下载成功,则开始检测那些组件需要更新
-if (DownloadModule(UpDateInfo_URL, "GDGUpDateInfo.ini", GDGUpDateInfo_Path) == True):
-    listOfLines = Read_ini(GDGUpDateInfo_Path)
-
-    # 对比新旧组件版本信息
-    GDGUpDateInfo_NewDate.clear()
-    for line in listOfLines:
-        UpDate = line.strip()
-        GDGUpDateInfo_NewDate.append(UpDate)
-
-    if (GDGUpDateInfo_NewDate[0] != GDGUpDateInfo_OldDate[0] and os.path.exists('GearDesignGuide.exe') == True):
-        os.remove('GearDesignGuide.exe')
-
-    if (GDGUpDateInfo_NewDate[1] != GDGUpDateInfo_OldDate[1] and os.path.exists('GearDesignGuide.dll') == True):
-        os.remove('GearDesignGuide.dll')
-
-    if (GDGUpDateInfo_NewDate[2] != GDGUpDateInfo_OldDate[2] and os.path.exists('./Resource/') == True):
-        del_files("./Resource/")
+def NetworkStatus():
+    response = os.system("ping baidu.com -n 1")
+    os.system('cls')
+    print("GearDesignGuideUpDate - Powered by RMSHE\n")
+    return True if response == 0 else False
 
 
-# 检查GearDesignGuide.exe与GearDesignGuide.dll时候存在,不存在则下载
-for name in Module:
-    if (os.path.exists(name) == False):
-        print(f"\n[提示]正在准备部署({name})")
+if (NetworkStatus() == False):
+    print(f"[警告]未连接网络")
+    SetUpMainProgram()
+else:
+    # 更新UpDateInfo(更新信息),并检查那些组件需要更新
+    if (os.path.exists('GDGUpDateInfo.ini') == True):
+        # 读取旧的组件版本信息
+        listOfLines = Read_ini(GDGUpDateInfo_Path)
+        GDGUpDateInfo_OldDate.clear()
+        for line in listOfLines:
+            OldUpDate = line.strip()
+            GDGUpDateInfo_OldDate.append(OldUpDate)
 
-        if (DownloadModule(Module[name]+name, name, f"./{name}") == False):
-            os.system("pause")
-            sys.exit()
+        # 删除旧的组件版本信息
+        os.remove('GDGUpDateInfo.ini')
 
+    # 如果GDGUpDateInfo.ini下载成功,则开始检测那些组件需要更新
+    if (DownloadModule(UpDateInfo_URL, "GDGUpDateInfo.ini", GDGUpDateInfo_Path) == True):
+        listOfLines = Read_ini(GDGUpDateInfo_Path)
 
-# 如果资源文件夹不存在则创建
-if (os.path.exists('./Resource') == False):
-    os.mkdir('./Resource')
+        # 对比新旧组件版本信息
+        GDGUpDateInfo_NewDate.clear()
+        for line in listOfLines:
+            UpDate = line.strip()
+            GDGUpDateInfo_NewDate.append(UpDate)
 
-# 检查资源文件时候存在,不存在则下载
-for name in Resource:
-    if (os.path.exists(f'./Resource/{name}') == False):
-        print(f"\n[提示]正在准备部署({name})")
+        if (GDGUpDateInfo_NewDate[0] != GDGUpDateInfo_OldDate[0] and os.path.exists('GearDesignGuide.exe') == True):
+            os.remove('GearDesignGuide.exe')
 
-        if (DownloadModule(Resource_URL+name, name, f"./Resource/{name}") == False):
-            os.system("pause")
-            sys.exit()
+        if (GDGUpDateInfo_NewDate[1] != GDGUpDateInfo_OldDate[1] and os.path.exists('GearDesignGuide.dll') == True):
+            os.remove('GearDesignGuide.dll')
 
+        if (GDGUpDateInfo_NewDate[2] != GDGUpDateInfo_OldDate[2] and os.path.exists('./Resource/') == True):
+            del_files("./Resource/")
 
-# 创建一个text文件(路径,文件内容)
-def text_create(path, msg):
-    file = open(path, 'w')
-    file.write(msg)
-    file.close()
+    # 检查GearDesignGuide.exe与GearDesignGuide.dll时候存在,不存在则下载
+    for name in Module:
+        if (os.path.exists(name) == False):
+            print(f"\n[提示]正在准备部署({name})")
 
+            if (DownloadModule(Module[name]+name, name, f"./{name}") == False):
+                os.system("pause")
+                sys.exit()
 
-if (os.path.exists('./GDGSetUp.ini') == False):
-    text_create('./GDGSetUp.ini', 'UpdateCompleted')
+    # 如果资源文件夹不存在则创建
+    if (os.path.exists('./Resource') == False):
+        os.mkdir('./Resource')
 
-os.system("GearDesignGuide.exe")
+    # 检查资源文件时候存在,不存在则下载
+    for name in Resource:
+        if (os.path.exists(f'./Resource/{name}') == False):
+            print(f"\n[提示]正在准备部署({name})")
+
+            if (DownloadModule(Resource_URL+name, name, f"./Resource/{name}") == False):
+                os.system("pause")
+                sys.exit()
+
+    SetUpMainProgram()
 
 # Pyinstaller -F -i LOGO1.ico GearDesignGuideUpDate.py
