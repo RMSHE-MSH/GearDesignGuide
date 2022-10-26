@@ -12,14 +12,6 @@ import requests
 import os
 import sys
 
-app = QApplication([])
-window = QMainWindow()
-window.resize(500, 400)
-window.move(300, 300)
-window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
-
-window.show()
-app.exec_()
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77'
@@ -28,14 +20,14 @@ headers = {
 UpDateExe_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/Release/GearDesignGuideUpDate.exe"
 
 
-def DownloadModule(URL: str, file_name: str, file_path: str):
+def DownloadModule(URL: str, file_name: str, file_path: str, Mode: str = "Download"):
     sleep(1)
-    print(f"[提示]正在尝试访问({URL})")
+    if (Mode == "Download"):
+        print(f"[提示]正在下载组件({file_name})")
+
     rf = requests.get(URL,  headers)
-    if (rf.status_code == 200):
-        print(f"[提示]正在下载组件({file_name})...")
-    else:
-        print(f"[错误]无法访问服务器({rf})")
+    if (rf.status_code != 200):
+        print(f"[错误]无法访问服务器({URL} / {rf})")
         return False
 
     with open(file_path, "wb") as code:
@@ -43,10 +35,14 @@ def DownloadModule(URL: str, file_name: str, file_path: str):
     rf.close()
 
     if (os.path.exists(file_path) == False):
-        print(f"[错误]组件下载失败({file_path})")
+        if (Mode == "Download"):
+            print(f"[错误]组件下载失败({file_path})")
+        else:
+            print(f"[错误]无法下载更新引导({file_path})")
         return False
     else:
-        print(f"[提示]组件已下载({file_path})")
+        if (Mode == "Download"):
+            print(f"[提示]组件已下载({file_path})")
         return True
 
 
@@ -61,9 +57,22 @@ def Module_Self_Test(file_name: str, file_path: str):
                 sys.exit()
         else:
             os.system("GearDesignGuideUpDate.exe")
+    else:
+        os.system("GearDesignGuideUpDate.exe")
 
 
 Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+
+app = QApplication([])
+window = QMainWindow()
+window.resize(500, 400)
+window.move(300, 300)
+window.setWindowTitle('GearDesignGuide - Powered by RMSHE')
+
+window.show()
+app.exec_()
+
+"""
 Module_Self_Test("GearDesignGuide.dll", "./GearDesignGuide.dll")
 
 Resource = (
@@ -71,14 +80,18 @@ Resource = (
     "P216_10-8.png", "P218_10-18.png", "P218_10-19.png", "P219_10-20.png", "P221_10-21.png"
 )
 for name in Resource:
-    Module_Self_Test(name,f"./Resource/{name}")
-
-
+    Module_Self_Test(name, f"./Resource/{name}")
+"""
 
 MathDll = CDLL("./GearDesignGuide.dll")
 if (MathDll.Info(114514) != 114514):
-    print("[致命错误]GearDesignGuide.dll未响应")
-    QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll未响应.')
+    print("[致命错误]GearDesignGuide.dll未响应,核心组件可能已损坏.")
+    QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll未响应,核心组件可能已损坏.')
+
+    print("[警告]正在尝试修复.")
+    os.remove("./GearDesignGuide.dll")
+    Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+
     os.system("pause")
     sys.exit()
 
