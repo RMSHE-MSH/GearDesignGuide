@@ -1,4 +1,7 @@
 //Powered by RMSHE / 2022.10.22;
+//git config --global https.proxy
+//git config --global --unset https.proxy
+//git config --global http.sslVerify "false"
 #pragma once
 #include "pch.h"
 #include <iostream>
