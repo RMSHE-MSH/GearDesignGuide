@@ -88,7 +88,7 @@ def Read_ini(file_path: str):
 
 
 def NetworkStatus():
-    response = os.system("ping baidu.com -n 1")
+    response = os.system("ping gitlab.com -n 1")
     os.system('cls')
     print("GearDesignGuideUpDate - Powered by RMSHE\n")
     return True if response == 0 else False

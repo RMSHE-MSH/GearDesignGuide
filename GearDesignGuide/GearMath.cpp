@@ -10,6 +10,7 @@
 #include <easyx.h>
 using namespace std;
 
+#define pi 3.14159265358979323846
 #define e 2.71828182845904523536
 vector <int> RMSHE{ 83, 159, 87, 106, 97, 112, 183, 145, 143, 132, 58, 122, 126, 91, 134, 57, 59, 63, 101, 115, 145, 106, 169, 109, 151, 58, 153, 162, 22, 146, 108, 128, 101, 77, 71, 74, 41, 79, 49, 29, 30, 27, 123, 73, 94, 46, 80 };
 
@@ -132,4 +133,71 @@ GEARMATH_API void c_ShowIMGDATA(char *name) {
 //线性插值(需插值的x坐标,两端基点坐标)将输出x对应的y坐标
 GEARMATH_API double c_Linear_interpolation(double x, double x0, double y0, double x1, double y1) {
 	return (y0 + ((((x - x0) * y1) - ((x - x0) * y0)) / (x1 - x0)));
+}
+
+//计算斜齿轮区域系数ZH
+GEARMATH_API double c_ZH_helical(double alpha_n, double beta) {
+	double alpha_t = atan(tan(alpha_n * pi / 180) / cos(beta * pi / 180));
+	double beta_b = atan(tan(beta * pi / 180) * cos(alpha_t * pi / 180));
+	double ZH = sqrt((2 * cos(beta_b)) / (cos(alpha_t) * sin(alpha_t)));
+
+	return ZH;
+}
+
+//计算斜齿轮接触疲劳强度重合度系数Z_epsilon
+GEARMATH_API double c_Zepsilon_helical(double z1, double z2, double alpha_n, double beta, double PHI_d, double h_an = 1) {
+	double alpha_t = atan(tan(alpha_n * pi / 180) / cos(beta * pi / 180));
+	double alpha_at1 = acos((z1 * cos(alpha_t)) / (z1 + 2 * h_an * cos(beta * pi / 180)));
+	double alpha_at2 = acos((z2 * cos(alpha_t)) / (z2 + 2 * h_an * cos(beta * pi / 180)));
+	double epsilon_alpha = (z1 * (tan(alpha_at1) - tan(alpha_t)) + z2 * (tan(alpha_at2) - tan(alpha_t))) / (2 * pi);
+	double epsilon_beta = (PHI_d * z1 * tan(beta * pi / 180)) / pi;
+	double Z_epsilon = sqrt(((4 - epsilon_alpha) / 3) * (1 - epsilon_beta) + (epsilon_beta / epsilon_alpha));
+
+	return Z_epsilon;
+}
+
+//试算小斜齿轮分度圆直径;
+GEARMATH_API double c_d1_test_helical(double KH_t, double T1, double PHI_d, double u, double ZH, double ZE, double Zepsilon, double Zbeta, double sigmaH) {
+	double A = (2 * KH_t * T1) / PHI_d;
+	double B = (u + 1) / u;
+	double C = pow(((ZH * ZE * Zepsilon * Zbeta) / sigmaH), 2);
+	double d1_test = pow(A * B * C, (1.0 / 3.0));
+
+	return d1_test;
+}
+
+//计算弯曲疲劳强度的重合度系数Y_epsilon
+GEARMATH_API double c_Y_epsilon_helical(double z1, double z2, double alpha_n, double beta, double h_an = 1) {
+	double alpha_t = atan(tan(alpha_n * pi / 180) / cos(beta * pi / 180));
+	double alpha_at1 = acos((z1 * cos(alpha_t)) / (z1 + 2 * h_an * cos(beta * pi / 180)));
+	double alpha_at2 = acos((z2 * cos(alpha_t)) / (z2 + 2 * h_an * cos(beta * pi / 180)));
+	double epsilon_alpha = (z1 * (tan(alpha_at1) - tan(alpha_t)) + z2 * (tan(alpha_at2) - tan(alpha_t))) / (2 * pi);
+	double beta_b = atan(tan(beta * pi / 180) * cos(alpha_t * pi / 180));
+	double epsilon_alpha_v = epsilon_alpha / (pow(cos(beta_b), 2));
+	double Y_epsilon = 0.25 + (0.75 / epsilon_alpha_v);
+
+	return Y_epsilon;
+}
+
+//计算斜齿轮弯曲疲劳强度的螺旋角系数Y_beta
+GEARMATH_API double c_Y_beta_helical(double beta, double z1, double PHI_d) {
+	double epsilon_beta = (PHI_d * z1 * tan(beta * pi / 180)) / pi;
+	double Y_beta = 1 - epsilon_beta * (beta / 120);
+
+	return Y_beta;
+}
+
+//计算斜齿轮当量齿数Zv
+GEARMATH_API double c_Zv_helical(double beta, double z) {
+	double Zv = z / pow(cos(beta * pi / 180), 3);
+
+	return Zv;
+}
+
+//试算弯曲疲劳计算的齿轮模数m_nt
+GEARMATH_API double c_mF_helical(double KFt, double T1, double Y_epsilon, double Y_beta, double beta, double PHI_d, double z1, double NYLL2) {
+	double A = (2 * KFt * T1 * Y_epsilon * Y_beta * pow(cos(beta * pi / 180), 2)) / (PHI_d * pow(z1, 2));
+	double m_nt = pow(A * NYLL2, (1.0 / 3.0));
+
+	return m_nt;
 }
