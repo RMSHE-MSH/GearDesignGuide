@@ -95,7 +95,7 @@ def NetworkStatus():
 
 
 if (NetworkStatus() == False):
-    print(f"[警告]未连接网络")
+    print(f"[警告]无网络连接")
     SetUpMainProgram()
 else:
     # 更新UpDateInfo(更新信息),并检查那些组件需要更新

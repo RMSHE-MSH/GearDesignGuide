@@ -63,6 +63,13 @@ def Read_ini(file_path: str):
     return listOfLines
 
 
+# 创建一个text文件(路径,文件内容)
+def text_create(path, msg):
+    file = open(path, 'w')
+    file.write(msg)
+    file.close()
+
+
 def Module_Self_Test(file_name: str, file_path: str):
     if (os.path.exists(file_path) == False):
         print(f"[错误]组件不存在({file_name})")
@@ -83,16 +90,30 @@ def Module_Self_Test(file_name: str, file_path: str):
         sys.exit()
 
 
+GDGSetUpInfo = []
+
+
+# 解读启动代码(当所给的代码与读取到的代码相同时返回真)
+def SetUpCode(Code: str):
+    SetUpReturn = False
+    for SetUp in GDGSetUpInfo:
+        if (SetUp == Code):
+            SetUpReturn = True
+            break
+    return SetUpReturn
+
+
 if (os.path.exists('./GDGSetUp.ini') == True):
     listOfLines = Read_ini("./GDGSetUp.ini")
     for line in listOfLines:
-        SetUp = line.strip()
+        GDGSetUpInfo.append(line.strip())
 
-        if (SetUp != "UpdateCompleted" and SkipUpdate == False):
-            Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+    if (SetUpCode("UpdateCompleted") == False and SkipUpdate == False):
+        Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
 else:
     if (SkipUpdate == False):
         Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+
 
 if (SkipUpdate == False):
     os.remove('GDGSetUp.ini')
@@ -109,7 +130,7 @@ for name in Resource:
 """
 
 MathDll = CDLL("./GearDesignGuide.dll")
-if (MathDll.Info(114514) != 114514):
+if (MathDll.SelfTest(114514) != 114514):
     print("[致命错误]GearDesignGuide.dll未响应,核心组件可能已损坏.")
     #QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll未响应,核心组件可能已损坏.')
 
@@ -117,10 +138,10 @@ if (MathDll.Info(114514) != 114514):
     os.remove("./GearDesignGuide.dll")
     Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
 
-    os.system("pause")
-    sys.exit()
-
-print("[GearDesignGuide - Beta.2022.10.27.Mark0] 斜齿轮设计&断点备份更新\n")
+if (SetUpCode("ImprotBreakpointData") == False):
+    MathDll.DllInfo()
+    print("[版本信息] GearDesignGuide - Beta.2022.10.28.Mark0 - 斜齿轮设计&断点备份&输入撤销&修复若干BUG;")
+    print("[更新提示] 如果您不慎输入了错误的数据,现在可通过键入代码: \"back\" 或 \"pop\" 来撤销一次操作.\n")
 
 Point = False  # 所有的数据按向导导引手动查表输入
 Bulk = True  # 批量读取"InputData.csv"中的预设数据
@@ -654,40 +675,74 @@ def findInputData():
 
 # 检查是否存在断点数据
 if (os.path.exists('BreakpointData.csv') == True):
-    InputData = input("[提示]检测到断点数据\"BreakpointData\": 是否导入? (Y / N) >>")
-    if ("Y" == InputData or "y" == InputData):
+    if (SetUpCode("ImprotBreakpointData") == True):
         InputBulkData('./BreakpointData.csv')
     else:
-        os.remove('BreakpointData.csv')  # 删除断点数据
-        findInputData()
+        InputData = input("[提示]检测到断点数据\"BreakpointData\": 是否导入? (Y / N) >>")
+        if ("Y" == InputData or "y" == InputData):
+            InputBulkData('./BreakpointData.csv')
+        else:
+            os.remove('BreakpointData.csv')  # 删除断点数据
+            findInputData()
 else:
     findInputData()
 
 
+# 断点堆栈弹出一行
+def BreakpointPop():
+    if (os.path.exists('BreakpointData.csv') == True):
+        f = open('BreakpointData.csv', "r+")
+        lines = f.readlines()
+        lines.pop()
+        f = open('BreakpointData.csv', "w+")
+        f.writelines(lines)
+        f.close()
+
+
+# 防火墙,所有输入的数据必须经过这个函数的审查;
+def firewall(Input: str, exc=False):
+    # 如果输入命令"back"或"pop", 则撤销最后一次的操作;
+    if (Input == "back" or Input == "pop" or Input == "BACK" or Input == "POP"):
+        BreakpointPop()
+        text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
+    if (exc == True):
+        return Input
+
+    # 如果输入不是纯数字则判定为非法字符
+    if (Input.replace('.', '', 1).isdigit() == False):
+        print("[警告]非法字符,请重新键入该值.")
+        text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
+    return Input
+
+
 if (DataMode == False or GearData.GearType == None):
-    GearData.GearType = eval(input("\n请确定设计的齿轮类型(直齿轮:0 / 斜齿轮:1): "))
+    GearData.GearType = eval(firewall(input("\n请确定设计的齿轮类型(直齿轮:0 / 斜齿轮:1): ")))
     BreakpointData("GearType")
 
 if (DataMode == False or GearData.InputPower == None):
-    GearData.InputPower = eval(input("设定输入功率(KW): "))
+    GearData.InputPower = eval(firewall(input("设定输入功率(KW): ")))
     BreakpointData("InputPower")
 if (DataMode == False or GearData.u_ima == None):
-    GearData.u_ima = eval(input("设定理论齿数比(传动比): "))
+    GearData.u_ima = eval(firewall(input("设定理论齿数比(传动比): ")))
     BreakpointData("u_ima")
 if (DataMode == False or GearData.n1 == None):
-    GearData.n1 = eval(input("设定小轮转速(r/min): "))
+    GearData.n1 = eval(firewall(input("设定小轮转速(r/min): ")))
     BreakpointData("n1")
 
 GearData.n2 = GearData.n1 / GearData.u_ima
 
 if (DataMode == False or GearData.Lh == None):
-    GearData.Lh = eval(input("工作寿命(h): "))
+    GearData.Lh = eval(firewall(input("工作寿命(h): ")))
     BreakpointData("Lh")
 
 if (DataMode == False or GearData.Level == None):
     print("\n>[查P216/10-7]确定齿轮精度等级")
     ShowIMGDATA("P216_10-7")
-    GearData.Level = eval(input("齿轮精度等级: "))
+    GearData.Level = eval(firewall(input("齿轮精度等级: ")))
     BreakpointData("Level")
     closegraph()
 
@@ -698,25 +753,25 @@ if (DataMode == False or GearData.Material1 == "" or GearData.Material2 == "" or
         print("硬度输入必须严格按照此示例格式(\"硬度数值\"+\"硬度单位\"): 286HB / 40HR / 850HV")
 
     if (GearData.Material1 == ""):
-        GearData.Material1 = input("小轮材料与热处理方式: ")
+        GearData.Material1 = firewall(input("小轮材料与热处理方式: "), exc=True)
         BreakpointData("Material1")
     if (GearData.G1Hardness == ""):
-        GearData.G1Hardness = str(input("小轮齿面硬度(HB/HR/HV): "))
+        GearData.G1Hardness = str(firewall(input("小轮齿面硬度(HB/HR/HV): "), exc=True))
         BreakpointData("G1Hardness")
     if (GearData.Material2 == ""):
-        GearData.Material2 = input("大轮材料与热处理方式: ")
+        GearData.Material2 = firewall(input("大轮材料与热处理方式: "), exc=True)
         BreakpointData("Material2")
     if (GearData.G2Hardness == ""):
-        GearData.G2Hardness = str(input("大轮齿面硬度(HB/HR/HV): "))
+        GearData.G2Hardness = str(firewall(input("大轮齿面硬度(HB/HR/HV): "), exc=True))
         BreakpointData("G2Hardness")
     closegraph()
 
 if (DataMode == False or GearData.z1_ima == None):
-    GearData.z1_ima = eval(input("初选小轮齿数: "))
+    GearData.z1_ima = eval(firewall(input("初选小轮齿数: ")))
     BreakpointData("z1_ima")
 
 if ((DataMode == False or GearData.beta_ima == None) and GearData.GearType == 1):
-    GearData.beta_ima = eval(input("初选螺旋角(°): "))
+    GearData.beta_ima = eval(firewall(input("初选螺旋角(°): ")))
     BreakpointData("beta_ima")
 
 GearData.z2_ima = GearData.u_ima*GearData.z1_ima
@@ -725,7 +780,7 @@ GearData.z2_ima = GearData.u_ima*GearData.z1_ima
 # 试选载荷系数KH_test
 if (DataMode == False or GearData.KH_test == None):
     print("\n>>[按齿轮表面疲劳强度设计]----------------------------------------")
-    GearData.KH_test = eval(input("试选载荷系数KHt(一般取1-3): "))
+    GearData.KH_test = eval(firewall(input("试选载荷系数KHt(一般取1-3): ")))
     BreakpointData("KH_test")
 
 # 小轮转矩T1为
@@ -736,7 +791,7 @@ GearData.T2 = 9550000 * GearData.InputPower / GearData.n2
 if (DataMode == False or GearData.PHI_d == None):
     print("\n>[查P216/10-8]选择齿宽系数Φd")
     ShowIMGDATA("P216_10-8")
-    GearData.PHI_d = eval(input("齿宽系数Φd: "))
+    GearData.PHI_d = eval(firewall(input("齿宽系数Φd: ")))
     BreakpointData("PHI_d")
     closegraph()
 
@@ -753,7 +808,7 @@ if (DataMode == False or GearData.ZE == None):
     print("\n>[查P213/10-6]根据齿轮制造方式确定弹性影响系数ZE")
     print(f"小轮材料与热处理方式 = {GearData.Material1}\n大轮材料与热处理方式 = {GearData.Material2}")
     ShowIMGDATA("P213_10-6")
-    GearData.ZE = eval(input("弹性影响系数ZE: "))
+    GearData.ZE = eval(firewall(input("弹性影响系数ZE: ")))
     BreakpointData("ZE")
     closegraph()
 
@@ -782,10 +837,10 @@ if (DataMode == False or GearData.sigmaHlim1 == None or GearData.sigmaHlim2 == N
     print(f"小轮材料与热处理方式 = {GearData.Material1};\t小轮硬度 = {GearData.G1Hardness};\n大轮材料与热处理方式 = {GearData.Material2};\t大轮硬度 = {GearData.G2Hardness};")
     ShowIMGDATA("P221_10-21")
     if (GearData.sigmaHlim1 == None):
-        GearData.sigmaHlim1 = eval(input("小轮接触疲劳极限σHlim1: "))
+        GearData.sigmaHlim1 = eval(firewall(input("小轮接触疲劳极限σHlim1: ")))
         BreakpointData("sigmaHlim1")
     if (GearData.sigmaHlim2 == None):
-        GearData.sigmaHlim2 = eval(input("大轮接触疲劳极限σHlim2: "))
+        GearData.sigmaHlim2 = eval(firewall(input("大轮接触疲劳极限σHlim2: ")))
         BreakpointData("sigmaHlim2")
     closegraph()
 
@@ -798,10 +853,10 @@ if (DataMode == False or GearData.KHN1 == None or GearData.KHN2 == None):
     print(f"小轮应力循环次数: N1 = {GearData.N1:.3E}\n大轮应力循环次数: N2 = {GearData.N2:.3E}")
     ShowIMGDATA("P218_10-19")
     if (GearData.KHN1 == None):
-        GearData.KHN1 = eval(input("小轮接触疲劳寿命系数KHN1: "))
+        GearData.KHN1 = eval(firewall(input("小轮接触疲劳寿命系数KHN1: ")))
         BreakpointData("KHN1")
     if (GearData.KHN2 == None):
-        GearData.KHN2 = eval(input("大轮接触疲劳寿命系数KHN2: "))
+        GearData.KHN2 = eval(firewall(input("大轮接触疲劳寿命系数KHN2: ")))
         BreakpointData("KHN2")
     closegraph()
 
@@ -846,7 +901,7 @@ if (GearData.GearType == 0):
 if (DataMode == False or GearData.KHA == None):
     print("\n>[查P205/10-2]确定使用系数KHA")
     ShowIMGDATA("P205_10-2")
-    GearData.KHA = eval(input("使用系数KHA: "))
+    GearData.KHA = eval(firewall(input("使用系数KHA: ")))
     BreakpointData("KHA")
     closegraph()
 
@@ -859,7 +914,7 @@ if (DataMode == False and GearData.KHV == None):
     print("\n>[查P206/10-8]确定动载系数KHV")
     print(f"小轮圆周速度: v = {GearData.V1_H:.3f} m/s;\t齿轮精度等级 = {GearData.Level};")
     ShowIMGDATA("P206_10-8")
-    GearData.KHV = eval(input("动载系数KHV: "))
+    GearData.KHV = eval(firewall(input("动载系数KHV: ")))
     BreakpointData("KHV")
     closegraph()
 
@@ -985,7 +1040,7 @@ if (DataMode == False and GearData.KHAlpha == None):
     else:
         print(f"(KA*Ft)/b = {GearData.NULL1:.1f} < 100 N/mm")
     ShowIMGDATA("P207_10-3")
-    GearData.KHAlpha = eval(input("齿间载荷分配系数KHalpha: "))
+    GearData.KHAlpha = eval(firewall(input("齿间载荷分配系数KHalpha: ")))
     BreakpointData("KHAlpha")
     closegraph()
 
@@ -994,7 +1049,7 @@ if (DataMode == False or GearData.KHbeta == None):
     print("\n>[查P208/10-4]齿向载荷分布系数KHbeta(线性插值)")
     print(f"齿宽系数: Φd = {GearData.PHI_d};\t小轮齿宽: b = {GearData.b1_H:.3f} mm;\t齿轮精度等级 = {GearData.Level};")
     ShowIMGDATA("P208_10-4")
-    GearData.KHbeta = eval(input("齿向载荷分布系数KHbeta: "))
+    GearData.KHbeta = eval(firewall(input("齿向载荷分布系数KHbeta: ")))
     BreakpointData("KHbeta")
     closegraph()
 
@@ -1104,10 +1159,10 @@ if (DataMode == False or GearData.sigmaFlim1 == None or GearData.sigmaFlim2 == N
     print(f"小轮材料与热处理方式 = {GearData.Material1};\t小轮硬度 = {GearData.G1Hardness};\n大轮材料与热处理方式 = {GearData.Material2};\t大轮硬度 = {GearData.G2Hardness};")
     ShowIMGDATA("P219_10-20")
     if (GearData.sigmaFlim1 == None):
-        GearData.sigmaFlim1 = eval(input("小轮齿根弯曲疲劳极限σFlim1(MPa): "))  # (MPa)
+        GearData.sigmaFlim1 = eval(firewall(input("小轮齿根弯曲疲劳极限σFlim1(MPa): ")))  # (MPa)
         BreakpointData("sigmaFlim1")
     if (GearData.sigmaFlim2 == None):
-        GearData.sigmaFlim2 = eval(input("大轮齿根弯曲疲劳极限σFlim2(MPa): "))  # (MPa)
+        GearData.sigmaFlim2 = eval(firewall(input("大轮齿根弯曲疲劳极限σFlim2(MPa): ")))  # (MPa)
         BreakpointData("sigmaFlim2")
     closegraph()
 
@@ -1117,16 +1172,16 @@ if (DataMode == False or GearData.KFN1 == None or GearData.KFN2 == None):
     print(f"小轮应力循环次数: N1 = {GearData.N1:.3E}\n大轮应力循环次数: N2 = {GearData.N2:.3E}")
     ShowIMGDATA("P218_10-18")
     if (GearData.KFN1 == None):
-        GearData.KFN1 = eval(input("小轮弯曲疲劳寿命系数KFN1: "))
+        GearData.KFN1 = eval(firewall(input("小轮弯曲疲劳寿命系数KFN1: ")))
         BreakpointData("KFN1")
     if (GearData.KFN2 == None):
-        GearData.KFN2 = eval(input("大轮弯曲疲劳寿命系数KFN2: "))
+        GearData.KFN2 = eval(firewall(input("大轮弯曲疲劳寿命系数KFN2: ")))
         BreakpointData("KFN2")
     closegraph()
 
 # 取弯曲疲劳安全系数S=1.4, 计算弯曲疲劳许用应力
 if (DataMode == False or GearData.SafeF == None):
-    GearData.SafeF = eval(input("给定弯曲疲劳安全系数SF(一般取1.25~1.5): "))
+    GearData.SafeF = eval(firewall(input("给定弯曲疲劳安全系数SF(一般取1.25~1.5): ")))
     BreakpointData("SafeF")
 
 Im_sigmaF1 = (GearData.KFN1 * GearData.sigmaFlim1) / GearData.SafeF
@@ -1182,7 +1237,7 @@ if (DataMode == False and GearData.KFV == None):
     print("\n>[查P206/10-8]确定动载系数KFV")
     print(f"小轮圆周速度: v = {GearData.VF_test:.3f} m/s;\t齿轮精度等级 = {GearData.Level};")
     ShowIMGDATA("P206_10-8")
-    GearData.KFV = eval(input("动载系数KFV: "))
+    GearData.KFV = eval(firewall(input("动载系数KFV: ")))
     BreakpointData("KFV")
     closegraph()
 
@@ -1200,7 +1255,7 @@ if (DataMode == False and GearData.KFAlpha == None):
         print(f"KA*Ft/b = {GearData.NULL4:.1f} >= 100")
 
     ShowIMGDATA("P207_10-3")
-    GearData.KFAlpha = eval(input("齿间载荷分配系数KFalpha: "))
+    GearData.KFAlpha = eval(firewall(input("齿间载荷分配系数KFalpha: ")))
     BreakpointData("KFAlpha")
     closegraph()
 
@@ -1212,7 +1267,7 @@ if (DataMode == False and GearData.KFbeta == None):
     print("\n>[查P208/10-13]确定弯曲强度计算的齿向载荷分布系数KFbeta")
     print(f"齿向载荷分布系数: KHbeta = {GearData.KHbeta:.3f};\tb/h = {GearData.NULL3:.3f};")
     ShowIMGDATA("P208_10-13")
-    GearData.KFbeta = eval(input("齿向载荷分布系数KFbeta: "))
+    GearData.KFbeta = eval(firewall(input("齿向载荷分布系数KFbeta: ")))
     BreakpointData("KFbeta")
     closegraph()
 
@@ -1248,7 +1303,7 @@ print("\n>>[计算几何尺寸]----------------------------------------")
 if (DataMode == False and GearData.m == None):
     print(f"请根据渐开线圆柱齿轮模数系列就近圆整计算模数;\t当前计算模数 = {GearData.m_rel:.3f};")
     ShowIMGDATA("GB_T_1357_1987")
-    GearData.m = eval(input("圆整模数m: "))
+    GearData.m = eval(firewall(input("圆整模数m: ")))
     BreakpointData("m")
     closegraph()
 
@@ -1282,8 +1337,8 @@ GearData.z2_rel = rounding(GearData.z2_rel)
 # 如果齿数不互质则重新手动指定两轮齿数
 if (coprime(GearData.z1_rel, GearData.z2_rel) == False):
     print(f"小轮齿数: z1 = {GearData.z1_rel};\t大轮齿数: z2 = {GearData.z2_rel};\n[提示] 两齿轮齿数没有互质!请圆整(如不调整则输入原值): ")
-    GearData.z1_rel = eval(input("新的小轮齿数z1: "))
-    GearData.z2_rel = eval(input("新的大轮齿数z2: "))
+    GearData.z1_rel = eval(firewall(input("新的小轮齿数z1: ")))
+    GearData.z2_rel = eval(firewall(input("新的大轮齿数z2: ")))
     BreakpointData("z1_rel")
     BreakpointData("z2_rel")
 
@@ -1474,8 +1529,8 @@ def GearStruct(_GearStructType, b, m, da, Axis_PHI):
 # 小轮结构设计
 if (DataMode == False or GearData.Axis1_PHI == None):
     print("\n>>[小轮结构设计]----------------------------------------")
-    print(f"小轮分度圆直径: d1 = {GearData.d1_rel} mm")
-    GearData.Axis1_PHI = eval(input("请给定小轮轴直径(mm): "))
+    print(f"小轮分度圆直径: d1 = {GearData.d1_rel:.3f} mm")
+    GearData.Axis1_PHI = eval(firewall(input("请给定小轮轴直径(mm): ")))
     BreakpointData("Axis1_PHI")
 GearData.Key1 = Key_Select(GearData.b1, GearData.Axis1_PHI)
 
@@ -1491,8 +1546,8 @@ GearData.Gear1Struct = GearStruct(GearData.Gear1StructType, GearData.b1, GearDat
 # 大轮结构设计
 if (DataMode == False or GearData.Axis2_PHI == None):
     print("\n>>[大轮结构设计]----------------------------------------")
-    print(f"大轮分度圆直径: d2 = {GearData.d2_rel} mm")
-    GearData.Axis2_PHI = eval(input("请给定大轮轴直径(mm): "))
+    print(f"大轮分度圆直径: d2 = {GearData.d2_rel:.3f} mm")
+    GearData.Axis2_PHI = eval(firewall(input("请给定大轮轴直径(mm): ")))
     BreakpointData("Axis2_PHI")
 GearData.Key2 = Key_Select(GearData.b2, GearData.Axis2_PHI)
 
@@ -1513,7 +1568,7 @@ if (os.path.exists('BreakpointData.csv') == True):
 print("\n>>[圆柱直齿轮副设计完成]")
 
 # 生成设计报告
-ReportMode = input("\n请选择呈现不同形式的报告:\t[E]设计简报;\t[D]设计参数;\t[R]设计报告;\t[C]设计过程    >>")
+ReportMode = firewall(input("\n请选择呈现不同形式的报告:\t[E]设计简报;\t[D]设计参数;\t[R]设计报告;\t[C]设计过程    >>"), exc=True)
 
 if (ReportMode == "E" or ReportMode == "e"):
     print("\n\n--------------------[设计简报]--------------------")
