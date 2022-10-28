@@ -1,3 +1,23 @@
+/*
+< GearDesignGuide >
+Copyright(C) < 2022 > <RMSHE>
+
+This program is free software : you can redistribute it and /or modify
+it under the terms of the GNU Affero General Public License as
+published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.If not, see < https://www.gnu.org/licenses/>.
+
+Electronic Mail : asdfghjkl851@outlook.com
+*/
+
 //Powered by RMSHE / 2022.10.22;
 //git config --global https.proxy
 //git config --global --unset https.proxy
@@ -14,7 +34,8 @@ using namespace std;
 #define e 2.71828182845904523536
 vector <int> RMSHE{ 81, 53, 107, 112, 88, 110, 107, 70, 102, 93, 110, 79, 25, 74, 98, 107, 98, 109, 100, 98, 23, 96, 117, 22, 73, 61, 80, 71, 59, 26, 35, 28, 88, 103, 86, 93, 93, 103, 103, 96, 96, 49, 40, 33, 53, 98, 110, 109, 105, 102, 106, 96, 44, 90, 95, 98 };
 vector <int> OpenSource{ 81, 67, 102, 97, 94, 82, 104, 114, 106, 90, 100, 79, 25, 98, 103, 104, 109, 110, 57, 45, 38, 101, 101, 106, 95, 101, 95, 45, 89, 105, 99, 43, 73, 65, 69, 63, 59, 44, 74, 72, 60, 40, 58, 85, 86, 101, 61, 94, 112, 96, 98, 99, 69, 108, 89, 89, 99 };
-vector <int> Copyright{ 57, 99, 102, 117, 98, 104, 96, 101, 108, 23, 39, 53, 34, 26, 69, 65, 80, 67, 68, 44, 23, 63, 104, 98, 23, 98, 102, 102, 94, 110, 105, 28, 105, 89, 101, 92, 104, 117, 98, 89, 34 };
+vector <int> Copyright{ 50, 59, 91, 93, 98, 67, 94, 112, 97, 94, 109, 57, 110, 99, 87, 89, 59, 27, 66, 109, 103, 119, 110, 95, 94, 88, 113, 31, 30, 61, 31, 28, 51, 38, 34, 41, 40, 61, 29, 21, 48, 75, 64, 67, 61, 56, 55 };
+vector <int> LICENSE{ 81, 64, 63, 63, 53, 77, 76, 66, 85, 23, 70, 64, 78, 26, 52, 58, 67, 64, 81, 77, 23, 69, 65, 68, 60, 66, 62, 75, 22, 74, 75, 62, 67, 61, 53, 23, 66, 72, 64, 58, 66, 76, 56, 16, 75, 88, 107, 108, 102, 102, 105, 21, 49 };
 vector <int> MathDll{ 81, 65, 87, 112, 88, 67, 101, 105, 85, 23, 70, 87, 90, 108, 55, 89, 112, 100, 102, 108, 62, 115, 101, 90, 92, 30, 97, 107, 98, 26, 35, 28, 57, 89, 102, 88, 36, 49, 45, 39, 38, 39, 36, 32, 35, 37, 49, 39, 74, 88, 109, 96, 46 };
 
 #define GEARMATH_API extern "C" __declspec(dllexport)
@@ -26,6 +47,7 @@ GEARMATH_API void DllInfo() {
 	cout << endl; for (int i = 0; i < RMSHE.size(); ++i) cout << char(RMSHE[i] + Key[i]);
 	cout << endl; for (int i = 0; i < OpenSource.size(); ++i) cout << char(OpenSource[i] + Key[i]);
 	cout << endl; for (int i = 0; i < Copyright.size(); ++i)cout << char(Copyright[i] + Key[i]);
+	cout << endl; for (int i = 0; i < LICENSE.size(); ++i)cout << char(LICENSE[i] + Key[i]);
 	cout << "\n" << endl; for (int i = 0; i < MathDll.size(); ++i)cout << char(MathDll[i] + Key[i]);
 	cout << endl;
 }

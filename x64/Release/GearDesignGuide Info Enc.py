@@ -1,10 +1,10 @@
-
 import random
 
 
 str0 = "[AuthorInfo] Powered by RMSHE - asdfghjkl851@outlook.com"
 str1 = "[OpenSource] https://github.com/RMSHE-MSH/GearDesignGuide"
-str2 = "Copyright (C) RMSHE. All rights reserved."
+str2 = "<GearDesignGuide> Copyright (C) <2022>  <RMSHE>"
+str4 = "[LICENSE] GNU AFFERO GENERAL PUBLIC LICENSE Version 3"
 str3 = "[MathDll] GearDesignGuide.dll - Beta.2022.10.28.Mark0"
 
 
@@ -30,3 +30,4 @@ print(toaASCII(str0, RandNum))
 print(toaASCII(str1, RandNum))
 print(toaASCII(str2, RandNum))
 print(toaASCII(str3, RandNum))
+print(toaASCII(str4, RandNum))
