@@ -1,0 +1,8 @@
+齿轮类型,GearType,1
+输入功率(KW),InputPower,11
+理论齿数比,u_ima,3.2
+小轮转速(r/min),n1,970
+工作寿命(h),Lh,60000
+小轮材料与热处理方式,Material1,40
+小轮硬度,G1Hardness,280HB
+大轮材料与热处理方式,Material2,45

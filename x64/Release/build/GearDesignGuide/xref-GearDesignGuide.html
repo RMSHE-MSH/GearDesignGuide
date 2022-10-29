@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>modulegraph cross reference for GearDesignGuide.py, pyi_rth_subprocess.py</title>
+    <title>modulegraph cross reference for GearDesignGuide.py, pyi_rth_inspect.py, pyi_rth_subprocess.py</title>
     <style>
       .node { padding: 0.5em 0 0.5em; border-top: thin grey dotted; }
       .moduletype { font: smaller italic }
@@ -11,7 +11,7 @@
     </style>
   </head>
   <body>
-    <h1>modulegraph cross reference for GearDesignGuide.py, pyi_rth_subprocess.py</h1>
+    <h1>modulegraph cross reference for GearDesignGuide.py, pyi_rth_inspect.py, pyi_rth_subprocess.py</h1>
 
 <div class="node">
   <a name="GearDesignGuide.py"></a>
@@ -22,6 +22,7 @@ imports:
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
  &#8226;   <a href="#abc">abc</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#codecs">codecs</a>
  &#8226;   <a href="#collections">collections</a>
  &#8226;   <a href="#collections.abc">collections.abc</a>
@@ -166,10 +167,12 @@ imports:
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#posixpath">posixpath</a>
+ &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
  &#8226;   <a href="#pyi_rth_subprocess.py">pyi_rth_subprocess.py</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#reprlib">reprlib</a>
  &#8226;   <a href="#requests">requests</a>
+ &#8226;   <a href="#shutil">shutil</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_constants">sre_constants</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
@@ -188,6 +191,24 @@ imports:
  &#8226;   <a href="#urllib.robotparser">urllib.robotparser</a>
  &#8226;   <a href="#warnings">warnings</a>
  &#8226;   <a href="#weakref">weakref</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="pyi_rth_inspect.py"></a>
+  <a target="code" href="///E:/Application/Python/Python39/Lib/site-packages/PyInstaller/hooks/rthooks/pyi_rth_inspect.py" type="text/plain"><tt>pyi_rth_inspect.py</tt></a>
+<span class="moduletype">Script</span>  <div class="import">
+imports:
+    <a href="#inspect">inspect</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
 
   </div>
 
@@ -261,7 +282,7 @@ imported by:
   <a target="code" href="" type="text/plain"><tt>'org.python'</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
-    <a href="#copy">copy</a>
+    <a href="#pickle">pickle</a>
 
   </div>
 
@@ -358,6 +379,16 @@ imported by:
   <tt>_abc</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
     <a href="#abc">abc</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="_ast"></a>
+  <tt>_ast</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
+imported by:
+    <a href="#ast">ast</a>
 
   </div>
 
@@ -788,6 +819,16 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="_opcode"></a>
+  <tt>_opcode</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
+imported by:
+    <a href="#opcode">opcode</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="_operator"></a>
   <tt>_operator</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
@@ -1171,6 +1212,7 @@ imported by:
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#importlib.abc">importlib.abc</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#io">io</a>
  &#8226;   <a href="#numbers">numbers</a>
  &#8226;   <a href="#os">os</a>
@@ -1198,8 +1240,11 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#calendar">calendar</a>
+    <a href="#ast">ast</a>
+ &#8226;   <a href="#calendar">calendar</a>
+ &#8226;   <a href="#dis">dis</a>
  &#8226;   <a href="#gzip">gzip</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#tokenize">tokenize</a>
  &#8226;   <a href="#zipfile">zipfile</a>
@@ -1213,6 +1258,30 @@ imported by:
   <tt>array</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
     <a href="#socket">socket</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="ast"></a>
+  <a target="code" href="///E:/Application/Python/Python39/lib/ast.py" type="text/plain"><tt>ast</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#_ast">_ast</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#collections">collections</a>
+ &#8226;   <a href="#contextlib">contextlib</a>
+ &#8226;   <a href="#enum">enum</a>
+ &#8226;   <a href="#inspect">inspect</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#warnings">warnings</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
+ &#8226;   <a href="#inspect">inspect</a>
 
   </div>
 
@@ -1329,6 +1398,7 @@ imported by:
  &#8226;   <a href="#codecs">codecs</a>
  &#8226;   <a href="#gettext">gettext</a>
  &#8226;   <a href="#gzip">gzip</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#lzma">lzma</a>
  &#8226;   <a href="#operator">operator</a>
@@ -1864,14 +1934,17 @@ imports:
 imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#charset_normalizer.cd">charset_normalizer.cd</a>
  &#8226;   <a href="#charset_normalizer.models">charset_normalizer.models</a>
  &#8226;   <a href="#collections.abc">collections.abc</a>
  &#8226;   <a href="#configparser">configparser</a>
  &#8226;   <a href="#contextlib">contextlib</a>
+ &#8226;   <a href="#dis">dis</a>
  &#8226;   <a href="#email.feedparser">email.feedparser</a>
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#pprint">pprint</a>
  &#8226;   <a href="#queue">queue</a>
  &#8226;   <a href="#requests.compat">requests.compat</a>
@@ -1938,6 +2011,7 @@ imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
  &#8226;   <a href="#configparser">configparser</a>
  &#8226;   <a href="#http.client">http.client</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#requests.compat">requests.compat</a>
  &#8226;   <a href="#selectors">selectors</a>
@@ -1989,6 +2063,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#_threading_local">_threading_local</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#getpass">getpass</a>
  &#8226;   <a href="#importlib._common">importlib._common</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
@@ -2026,8 +2101,8 @@ imported by:
   <a target="code" href="///E:/Application/Python/Python39/lib/copy.py" type="text/plain"><tt>copy</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#'org.python'">'org.python'</a>
- &#8226;   <a href="#copyreg">copyreg</a>
+    <a href="#copyreg">copyreg</a>
+ &#8226;   <a href="#org">org</a>
  &#8226;   <a href="#types">types</a>
  &#8226;   <a href="#weakref">weakref</a>
 
@@ -2175,6 +2250,27 @@ imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
  &#8226;   <a href="#fractions">fractions</a>
  &#8226;   <a href="#statistics">statistics</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="dis"></a>
+  <a target="code" href="///E:/Application/Python/Python39/lib/dis.py" type="text/plain"><tt>dis</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#argparse">argparse</a>
+ &#8226;   <a href="#collections">collections</a>
+ &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#opcode">opcode</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#types">types</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#inspect">inspect</a>
 
   </div>
 
@@ -5183,7 +5279,9 @@ imports:
   <div class="import">
 imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#http">http</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#py_compile">py_compile</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#signal">signal</a>
@@ -5309,6 +5407,7 @@ imported by:
  &#8226;   <a href="#importlib._common">importlib._common</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.util">importlib.util</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#ipaddress">ipaddress</a>
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
@@ -5806,6 +5905,7 @@ imported by:
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.resources">importlib.resources</a>
  &#8226;   <a href="#importlib.util">importlib.util</a>
+ &#8226;   <a href="#inspect">inspect</a>
 
   </div>
 
@@ -5925,6 +6025,7 @@ imports:
 imported by:
     <a href="#importlib">importlib</a>
  &#8226;   <a href="#importlib.abc">importlib.abc</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#py_compile">py_compile</a>
 
   </div>
@@ -6018,6 +6119,43 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="inspect"></a>
+  <a target="code" href="///E:/Application/Python/Python39/lib/inspect.py" type="text/plain"><tt>inspect</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#abc">abc</a>
+ &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#ast">ast</a>
+ &#8226;   <a href="#builtins">builtins</a>
+ &#8226;   <a href="#collections">collections</a>
+ &#8226;   <a href="#collections.abc">collections.abc</a>
+ &#8226;   <a href="#dis">dis</a>
+ &#8226;   <a href="#enum">enum</a>
+ &#8226;   <a href="#functools">functools</a>
+ &#8226;   <a href="#importlib">importlib</a>
+ &#8226;   <a href="#importlib.machinery">importlib.machinery</a>
+ &#8226;   <a href="#itertools">itertools</a>
+ &#8226;   <a href="#linecache">linecache</a>
+ &#8226;   <a href="#operator">operator</a>
+ &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#re">re</a>
+ &#8226;   <a href="#sys">sys</a>
+ &#8226;   <a href="#token">token</a>
+ &#8226;   <a href="#tokenize">tokenize</a>
+ &#8226;   <a href="#types">types</a>
+ &#8226;   <a href="#warnings">warnings</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#ast">ast</a>
+ &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="io"></a>
   <a target="code" href="///E:/Application/Python/Python39/lib/io.py" type="text/plain"><tt>io</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -6033,6 +6171,7 @@ imported by:
  &#8226;   <a href="#bz2">bz2</a>
  &#8226;   <a href="#configparser">configparser</a>
  &#8226;   <a href="#csv">csv</a>
+ &#8226;   <a href="#dis">dis</a>
  &#8226;   <a href="#email.feedparser">email.feedparser</a>
  &#8226;   <a href="#email.generator">email.generator</a>
  &#8226;   <a href="#email.iterators">email.iterators</a>
@@ -6103,6 +6242,7 @@ imported by:
  &#8226;   <a href="#configparser">configparser</a>
  &#8226;   <a href="#fnmatch">fnmatch</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#pickle">pickle</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#reprlib">reprlib</a>
@@ -6225,6 +6365,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#traceback">traceback</a>
  &#8226;   <a href="#tracemalloc">tracemalloc</a>
  &#8226;   <a href="#warnings">warnings</a>
@@ -6501,6 +6642,22 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="opcode"></a>
+  <a target="code" href="///E:/Application/Python/Python39/lib/opcode.py" type="text/plain"><tt>opcode</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#_opcode">_opcode</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#dis">dis</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="operator"></a>
   <a target="code" href="///E:/Application/Python/Python39/lib/operator.py" type="text/plain"><tt>operator</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
@@ -6517,6 +6674,7 @@ imported by:
  &#8226;   <a href="#email._header_value_parser">email._header_value_parser</a>
  &#8226;   <a href="#fractions">fractions</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#statistics">statistics</a>
  &#8226;   <a href="#typing">typing</a>
@@ -6550,7 +6708,7 @@ imported by:
   <a target="code" href="" type="text/plain"><tt>org</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
-    <a href="#pickle">pickle</a>
+    <a href="#copy">copy</a>
 
   </div>
 
@@ -6595,6 +6753,7 @@ imported by:
  &#8226;   <a href="#importlib._common">importlib._common</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.resources">importlib.resources</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#logging">logging</a>
@@ -6607,6 +6766,7 @@ imported by:
  &#8226;   <a href="#pathlib">pathlib</a>
  &#8226;   <a href="#posixpath">posixpath</a>
  &#8226;   <a href="#py_compile">py_compile</a>
+ &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
  &#8226;   <a href="#random">random</a>
  &#8226;   <a href="#requests.auth">requests.auth</a>
  &#8226;   <a href="#requests.sessions">requests.sessions</a>
@@ -6681,14 +6841,14 @@ imported by:
   <a target="code" href="///E:/Application/Python/Python39/lib/pickle.py" type="text/plain"><tt>pickle</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#_compat_pickle">_compat_pickle</a>
+    <a href="#'org.python'">'org.python'</a>
+ &#8226;   <a href="#_compat_pickle">_compat_pickle</a>
  &#8226;   <a href="#_pickle">_pickle</a>
  &#8226;   <a href="#codecs">codecs</a>
  &#8226;   <a href="#copyreg">copyreg</a>
  &#8226;   <a href="#functools">functools</a>
  &#8226;   <a href="#io">io</a>
  &#8226;   <a href="#itertools">itertools</a>
- &#8226;   <a href="#org">org</a>
  &#8226;   <a href="#pprint">pprint</a>
  &#8226;   <a href="#re">re</a>
  &#8226;   <a href="#struct">struct</a>
@@ -6947,6 +7107,7 @@ imported by:
  &#8226;   <a href="#http.cookies">http.cookies</a>
  &#8226;   <a href="#idna.core">idna.core</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#ipaddress">ipaddress</a>
  &#8226;   <a href="#json.decoder">json.decoder</a>
  &#8226;   <a href="#json.encoder">json.encoder</a>
@@ -7550,7 +7711,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#argparse">argparse</a>
+    <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
+ &#8226;   <a href="#argparse">argparse</a>
  &#8226;   <a href="#tarfile">tarfile</a>
  &#8226;   <a href="#tempfile">tempfile</a>
  &#8226;   <a href="#zipfile">zipfile</a>
@@ -7888,6 +8050,7 @@ imported by:
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_pydecimal">_pydecimal</a>
  &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#base64">base64</a>
  &#8226;   <a href="#calendar">calendar</a>
  &#8226;   <a href="#certifi.core">certifi.core</a>
@@ -7898,6 +8061,7 @@ imported by:
  &#8226;   <a href="#ctypes">ctypes</a>
  &#8226;   <a href="#ctypes._endian">ctypes._endian</a>
  &#8226;   <a href="#datetime">datetime</a>
+ &#8226;   <a href="#dis">dis</a>
  &#8226;   <a href="#email._header_value_parser">email._header_value_parser</a>
  &#8226;   <a href="#email.generator">email.generator</a>
  &#8226;   <a href="#email.iterators">email.iterators</a>
@@ -7917,6 +8081,7 @@ imported by:
  &#8226;   <a href="#importlib._bootstrap_external">importlib._bootstrap_external</a>
  &#8226;   <a href="#importlib.metadata">importlib.metadata</a>
  &#8226;   <a href="#importlib.util">importlib.util</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#logging">logging</a>
@@ -7929,6 +8094,7 @@ imported by:
  &#8226;   <a href="#posixpath">posixpath</a>
  &#8226;   <a href="#pprint">pprint</a>
  &#8226;   <a href="#py_compile">py_compile</a>
+ &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
  &#8226;   <a href="#pyi_rth_subprocess.py">pyi_rth_subprocess.py</a>
  &#8226;   <a href="#quopri">quopri</a>
  &#8226;   <a href="#requests.compat">requests.compat</a>
@@ -8139,6 +8305,7 @@ imported by:
 <span class="moduletype">SourceModule</span>  <div class="import">
 imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#tokenize">tokenize</a>
 
   </div>
@@ -8165,6 +8332,7 @@ imports:
 imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
  &#8226;   <a href="#importlib._bootstrap_external">importlib._bootstrap_external</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#linecache">linecache</a>
 
   </div>
@@ -8235,6 +8403,7 @@ imported by:
  &#8226;   <a href="#contextlib">contextlib</a>
  &#8226;   <a href="#copy">copy</a>
  &#8226;   <a href="#ctypes">ctypes</a>
+ &#8226;   <a href="#dis">dis</a>
  &#8226;   <a href="#email.headerregistry">email.headerregistry</a>
  &#8226;   <a href="#enum">enum</a>
  &#8226;   <a href="#functools">functools</a>
@@ -8242,6 +8411,7 @@ imported by:
  &#8226;   <a href="#importlib">importlib</a>
  &#8226;   <a href="#importlib.resources">importlib.resources</a>
  &#8226;   <a href="#importlib.util">importlib.util</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#pickle">pickle</a>
  &#8226;   <a href="#pprint">pprint</a>
  &#8226;   <a href="#queue">queue</a>
@@ -9422,6 +9592,7 @@ imported by:
     <a href="#GearDesignGuide.py">GearDesignGuide.py</a>
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#argparse">argparse</a>
+ &#8226;   <a href="#ast">ast</a>
  &#8226;   <a href="#charset_normalizer.api">charset_normalizer.api</a>
  &#8226;   <a href="#charset_normalizer.legacy">charset_normalizer.legacy</a>
  &#8226;   <a href="#charset_normalizer.models">charset_normalizer.models</a>
@@ -9439,6 +9610,7 @@ imported by:
  &#8226;   <a href="#importlib">importlib</a>
  &#8226;   <a href="#importlib.abc">importlib.abc</a>
  &#8226;   <a href="#importlib.util">importlib.util</a>
+ &#8226;   <a href="#inspect">inspect</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#logging">logging</a>
  &#8226;   <a href="#os">os</a>

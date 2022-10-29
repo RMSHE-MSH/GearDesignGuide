@@ -21,10 +21,12 @@
 # 渐开线圆柱直齿轮副优化设计计算向导
 # Powered by RMSHE / 2022.10.18
 # Python 3.9.13 64-bit
+from ast import Str
 from ctypes import *
 from decimal import *
 from math import *
 from time import sleep
+from shutil import copy
 #from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 import csv
 import re
@@ -32,7 +34,9 @@ import requests
 import os
 import sys
 
-SkipUpdate = False  # 跳过更新
+# Pyinstaller -F -i LOGO_CORE.ico GearDesignGuide.py
+
+SkipUpdate = False  # 跳过更新(后门,发布程序时一定要改为False)
 
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36 Edg/103.0.1264.77'
@@ -50,25 +54,57 @@ UpDateExe_URL = "https://gitlab.com/RMSHE-MSH/GearDesignGuide/-/raw/master/x64/R
 # app.exec_()
 
 
-def DownloadModule(URL: str, file_name: str, file_path: str):
-    sleep(2)
-    print(f"[提示]正在下载组件({file_name})")
+# 下载组件
+class Downloader(object):
+    def __init__(self, url, file_path):
+        self.url = url
+        self.file_path = file_path
 
-    rf = requests.get(URL,  headers)
-    if (rf.status_code != 200):
-        print(f"[错误]无法访问服务器({URL} / {rf})")
-        return False
+    def start(self):
+        Finish = False
+        sleep(2)
+        res_length = requests.get(self.url, stream=True)
+        total_size = int(res_length.headers['Content-Length'])
+        # print(res_length.headers)
+        # print(res_length)
+        if os.path.exists(self.file_path):
+            temp_size = os.path.getsize(self.file_path)
+            print(f"[续传]当前断点: {(temp_size/1024):.1f}KB/{(total_size/1024):.1f}KB ({self.file_path})")
+        else:
+            temp_size = 0
+            print(f"[提示]正在下载组件 {self.file_path} ({(total_size/1024):.1f}KB)")
 
-    with open(file_path, "wb") as code:
-        code.write(rf.content)
-    rf.close()
+        headers = {'Range': 'bytes=%d-' % temp_size,
+                   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:81.0) Gecko/20100101 Firefox/81.0"}
 
-    if (os.path.exists(file_path) == False):
-        print(f"[错误]组件下载失败({file_path})")
-        return False
-    else:
-        print(f"[提示]组件已下载({file_path})")
-        return True
+        sleep(0.5)
+        res_left = requests.get(self.url, stream=True, headers=headers)
+
+        with open(self.file_path, "ab") as f:
+            for chunk in res_left.iter_content(chunk_size=1024):
+                temp_size += len(chunk)
+                f.write(chunk)
+                f.flush()
+
+                done = int(50 * temp_size / total_size)
+                sys.stdout.write(
+                    f"\r|{'█' * done}{' ' * (50 - done)} | {(temp_size/1024):.1f}KB ({(100 * temp_size / total_size):.1f}%)")
+                sys.stdout.flush()
+
+        if os.path.exists(self.file_path):
+            if ((100 * temp_size / total_size) >= 100):
+                Finish = True
+
+        if (Finish == False):
+            print(f"\n[错误]组件下载失败({self.file_path})")
+
+        print("\n")
+        return Finish
+
+
+def DownloadModule(URL: str, file_path: str):
+    downloader = Downloader(URL, file_path)
+    return downloader.start()
 
 
 # 读取ini文件;
@@ -90,16 +126,38 @@ def text_create(path, msg):
     file.close()
 
 
+# 删除指定目录path_file下所有文件
+def del_files(path_file):
+    ls = os.listdir(path_file)
+    for i in ls:
+        f_path = os.path.join(path_file, i)
+        # 判断是否是一个目录,若是,则递归删除
+        if os.path.isdir(f_path):
+            del_files(f_path)
+        else:
+            os.remove(f_path)
+
+
+# 检查GearDesignGuideUpDate.exe是否存在,如果不存在则下载
 def Module_Self_Test(file_name: str, file_path: str):
+    # 如果下载缓存文件夹不存在则创建
+    if (os.path.exists('./Cache') == False):
+        os.mkdir('./Cache')
+
     if (os.path.exists(file_path) == False):
         print(f"[错误]组件不存在({file_name})")
         #QMessageBox.critical(window, '错误', f'组件不存在({file_name})')
 
         if (file_name == "GearDesignGuideUpDate.exe"):
-            if (DownloadModule(UpDateExe_URL, file_name, file_path) == False):
+            if (DownloadModule(UpDateExe_URL, f"./{file_name}.Temp") == False):
                 os.system("pause")
                 sys.exit()
             else:
+                sleep(1)
+                # 下载完成后安装"GearDesignGuideUpData.exe"
+                os.rename(f"./{file_name}.Temp", f"./{file_name}")
+                sleep(1)
+                # 启动"GearDesignGuideUpData.exe"
                 os.startfile(r"GearDesignGuideUpDate.exe")
                 sys.exit()
         else:
@@ -108,6 +166,31 @@ def Module_Self_Test(file_name: str, file_path: str):
     else:
         os.startfile(r"GearDesignGuideUpDate.exe")
         sys.exit()
+
+
+# 复制安装文件(a -> b)
+def CopyInstallFile(a_path, b_path):
+    # 如果新版文件存在则执行复制操作(更新)
+    if (os.path.exists(a_path) == True):
+        # 如果旧版文件存在,则删除旧版文件
+        if (os.path.exists(b_path) == True):
+            os.remove(b_path)
+        # 复制新版文件到运行目录,如果复制完成并且下载缓存目录中的新版文件存在,则删除缓存的新版文件
+        if (copy(a_path, b_path) and os.path.exists(a_path)):
+            os.remove(a_path)
+
+
+# 安装更新
+def InstallUpdate():
+    # 更新"GearDesignGuideUpData.exe"
+    CopyInstallFile("./Cache/GearDesignGuideUpData.exe", "./GearDesignGuideUpData.exe")
+
+    # 更新"GDGUpDateInfo.ini"文件
+    CopyInstallFile("./Cache/GDGUpDateInfo.ini", "./GDGUpDateInfo.ini")
+
+    # 清除下载缓存区
+    if (os.path.exists('./Cache') == True):
+        del_files("./Cache/")
 
 
 GDGSetUpInfo = []
@@ -123,6 +206,7 @@ def SetUpCode(Code: str):
     return SetUpReturn
 
 
+# 判断是否跳过启动"GearDesignGuideUpDate.exe"
 if (os.path.exists('./GDGSetUp.ini') == True):
     listOfLines = Read_ini("./GDGSetUp.ini")
     for line in listOfLines:
@@ -130,6 +214,9 @@ if (os.path.exists('./GDGSetUp.ini') == True):
 
     if (SetUpCode("UpdateCompleted") == False and SkipUpdate == False):
         Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
+
+    if (SetUpCode("InstallUpdate") == True):
+        InstallUpdate()
 else:
     if (SkipUpdate == False):
         Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
@@ -155,12 +242,14 @@ if (MathDll.SelfTest(114514) != 114514):
     #QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll未响应,核心组件可能已损坏.')
 
     print("[警告]正在尝试修复.")
-    os.remove("./GearDesignGuide.dll")
+    if (os.path.exists("./GearDesignGuide.dll") == True):
+        os.remove("./GearDesignGuide.dll")
     Module_Self_Test("GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
 
-if (SetUpCode("ImprotBreakpointData") == False):
+if (SetUpCode("ImprotBreakpointData") == False and SetUpCode("ImprotInputData") == False):
+    os.system("cls")
     MathDll.DllInfo()
-    print("[版本信息] GearDesignGuide - Beta.2022.10.28.Mark0 - 斜齿轮设计&断点备份&输入撤销&修复若干BUG;")
+    print("[版本信息] GearDesignGuide - Beta.2022.10.30.Mark0 - 斜齿轮设计&断点备份&输入撤销&自动更新机制大改;")
     print("[更新提示] 如果您不慎输入了错误的数据,现在可通过键入代码: \"back\" 或 \"pop\" 来撤销一次操作.\n")
 
 Point = False  # 所有的数据按向导导引手动查表输入
@@ -688,9 +777,12 @@ DataMode = Bulk
 # 检查是否存在批量数据
 def findInputData():
     if (os.path.exists('InputData.csv') == True):
-        InputData = input("[提示]检测到批量数据\"InputData\": 是否导入? (Y / N) >>")
-        if ("Y" == InputData or "y" == InputData) and DataMode == True:
+        if (SetUpCode("ImprotInputData") == True):
             InputBulkData('./InputData.csv')
+        else:
+            InputData = input("[提示]检测到批量数据\"InputData\": 是否导入? (Y / N) >>")
+            if ("Y" == InputData or "y" == InputData) and DataMode == True:
+                InputBulkData('./InputData.csv')
 
 
 # 检查是否存在断点数据
@@ -719,6 +811,13 @@ def BreakpointPop():
         f.close()
 
 
+# 非法输入处理器(处理方式)
+def illegal_input_handler(method: str = 'UpdateCompleted\nImprotBreakpointData'):
+    print("[警告]非法字符,请重新键入该值.")
+    text_create('./GDGSetUp.ini', method)
+    os.execl(sys.executable, sys.executable, *sys.argv)  # 重启程序
+
+
 # 防火墙,所有输入的数据必须经过这个函数的审查;
 def firewall(Input: str, exc=False):
     # 如果输入命令"back"或"pop", 则撤销最后一次的操作;
@@ -732,9 +831,7 @@ def firewall(Input: str, exc=False):
 
     # 如果输入不是纯数字则判定为非法字符
     if (Input.replace('.', '', 1).isdigit() == False):
-        print("[警告]非法字符,请重新键入该值.")
-        text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        illegal_input_handler('UpdateCompleted\nImprotBreakpointData')
 
     return Input
 
@@ -766,6 +863,20 @@ if (DataMode == False or GearData.Level == None):
     BreakpointData("Level")
     closegraph()
 
+
+# 判断输入的硬度格式是否合法,若合法则返回字母转为大写的输入字符串,否则要求重新输入.
+def illegal_Hardness(Hardness: Str):
+    # 将输入字符串中的字母转为大写
+    HardnessInput = Hardness.upper()
+    # 获取输入字符串中的所有字母
+    Format = ''.join(re.split(r'[^A-Za-z]', HardnessInput))
+    # 判断输入是否合法;
+    if (Format == "HB" or Format == "HR" or Format == "HV"):
+        return HardnessInput  # 硬度格式合法
+    else:
+        illegal_input_handler('UpdateCompleted\nImprotBreakpointData')  # 硬度格式非法,启动非法输入处理器
+
+
 if (DataMode == False or GearData.Material1 == "" or GearData.Material2 == "" or GearData.G1Hardness == "" or GearData.G2Hardness == ""):
     print("\n>[查P203_10-1]选择两轮材料和热处理方式")
     ShowIMGDATA("P203_10-1")
@@ -776,13 +887,13 @@ if (DataMode == False or GearData.Material1 == "" or GearData.Material2 == "" or
         GearData.Material1 = firewall(input("小轮材料与热处理方式: "), exc=True)
         BreakpointData("Material1")
     if (GearData.G1Hardness == ""):
-        GearData.G1Hardness = str(firewall(input("小轮齿面硬度(HB/HR/HV): "), exc=True))
+        GearData.G1Hardness = str(illegal_Hardness(firewall(input("小轮齿面硬度(HB/HR/HV): "), exc=True)))
         BreakpointData("G1Hardness")
     if (GearData.Material2 == ""):
         GearData.Material2 = firewall(input("大轮材料与热处理方式: "), exc=True)
         BreakpointData("Material2")
     if (GearData.G2Hardness == ""):
-        GearData.G2Hardness = str(firewall(input("大轮齿面硬度(HB/HR/HV): "), exc=True))
+        GearData.G2Hardness = str(illegal_Hardness(firewall(input("大轮齿面硬度(HB/HR/HV): "), exc=True)))
         BreakpointData("G2Hardness")
     closegraph()
 
@@ -1585,7 +1696,7 @@ WriteGearData()
 if (os.path.exists('BreakpointData.csv') == True):
     os.remove('BreakpointData.csv')
 
-print("\n>>[圆柱直齿轮副设计完成]")
+print("\n>>[齿轮副设计完成]")
 
 # 生成设计报告
 ReportMode = firewall(input("\n请选择呈现不同形式的报告:\t[E]设计简报;\t[D]设计参数;\t[R]设计报告;\t[C]设计过程    >>"), exc=True)
@@ -1656,6 +1767,8 @@ elif (ReportMode == "D" or ReportMode == "d"):
         for i in reader:
             print(i)
     print("--------------------[参数结束]--------------------")
+else:
+    illegal_input_handler('UpdateCompleted\nImprotInputData')
 
 
 os.system("pause")
