@@ -305,6 +305,9 @@ def InstallUpdate(Install_License):
 
     # 告诉"GearDesignGuide.exe",执行"GearDesignGuideUpDate.exe"的安装.
     if (Install_License[2][0] == True and Install_License[2][1] == True):
+        if (os.path.exists('./GDGSetUp.ini') == True):
+            os.remove('./GDGSetUp.ini')
+
         if (os.path.exists('./GDGSetUp.ini') == False):
             text_create('./GDGSetUp.ini', 'UpdateCompleted\nInstallUpdate')
 
@@ -369,4 +372,4 @@ if (DownloadModule(GDGEXE_URL, GDGEXE_CachePath) == True):
         os.remove(GDGEXE_CachePath)
 """
 
-# Pyinstaller -F -i LOGO1.ico GearDesignGuideUpDate.py
+# Pyinstaller -F -i LOGO2.ico GearDesignGuideUpDate.py

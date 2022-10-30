@@ -182,8 +182,8 @@ def CopyInstallFile(a_path, b_path):
 
 # 安装更新
 def InstallUpdate():
-    # 更新"GearDesignGuideUpData.exe"
-    CopyInstallFile("./Cache/GearDesignGuideUpData.exe", "./GearDesignGuideUpData.exe")
+    # 更新"GearDesignGuideUpDate.exe"
+    CopyInstallFile("./Cache/GearDesignGuideUpDate.exe", "./GearDesignGuideUpDate.exe")
 
     # 更新"GDGUpDateInfo.ini"文件
     CopyInstallFile("./Cache/GDGUpDateInfo.ini", "./GDGUpDateInfo.ini")
@@ -249,8 +249,8 @@ if (MathDll.SelfTest(114514) != 114514):
 if (SetUpCode("ImprotBreakpointData") == False and SetUpCode("ImprotInputData") == False):
     os.system("cls")
     MathDll.DllInfo()
-    print("[版本信息] GearDesignGuide - Beta.2022.10.30.Mark0 - 斜齿轮设计&断点备份&输入撤销&自动更新机制大改;")
-    print("[更新提示] 如果您不慎输入了错误的数据,现在可通过键入代码: \"back\" 或 \"pop\" 来撤销一次操作.\n")
+    print("[版本信息] GearDesignGuide - Beta.2022.10.31.Mark0 - 斜齿轮设计&断点备份&输入撤销&自动更新机制大改&命令提示符;")
+    print("[更新提示] CommandPrompt上线, 键入\"help\"查看所有命令.\n")
 
 Point = False  # 所有的数据按向导导引手动查表输入
 Bulk = True  # 批量读取"InputData.csv"中的预设数据
@@ -274,7 +274,7 @@ class GearData:
 
     AlphaN: float = 20  # 法截面中的压力角(°)
 
-    Level: int = 7  # 齿轮精度等级
+    Level: int = None  # 齿轮精度等级
 
     Material1: str = ""  # 小轮材料与热处理方式
     Material2: str = ""  # 大轮材料与热处理方式
@@ -531,50 +531,81 @@ def WriteGearData():
         GD.writerow(["斜齿轮修正(实际)螺旋角", "beta_rel", GearData.beta_rel])
 
 
-def WriteInputData():
-    with open("InputData.csv", "w", newline='') as csvfile:
+def WriteInputData(file_name: str = "InputData.csv"):
+    with open(file_name, "w", newline='') as csvfile:
         ID = csv.writer(csvfile)
-        ID.writerow(["齿轮类型", "GearType", GearData.GearType])
-        ID.writerow(["输入功率(KW)", "InputPower", GearData.InputPower])
-        ID.writerow(["理论齿数比", "u_ima", GearData.u_ima])
-        ID.writerow(["小轮转速(r/min)", "n1", GearData.n1])
-        ID.writerow(["工作寿命(h)", "Lh", GearData.Lh])
-        ID.writerow(["齿轮精度等级", "Level", GearData.Level])
-        ID.writerow(["小轮材料与热处理方式", "Material1", GearData.Material1])
-        ID.writerow(["大轮材料与热处理方式", "Material2", GearData.Material2])
-        ID.writerow(["小轮硬度", "G1Hardness", GearData.G1Hardness])
-        ID.writerow(["大轮硬度", "G2Hardness", GearData.G2Hardness])
-        ID.writerow(["小轮初选齿数", "z1_ima", GearData.z1_ima])
-        ID.writerow(["初选螺旋角", "beta_ima", GearData.beta_ima])
-        ID.writerow(["试选载荷系数", "KH_test", GearData.KH_test])
-        ID.writerow(["齿宽系数", "PHI_d", GearData.PHI_d])
-        ID.writerow(["弹性影响系数", "ZE", GearData.ZE])
-        ID.writerow(["小轮接触疲劳极限", "sigmaHlim1", GearData.sigmaHlim1])
-        ID.writerow(["大轮接触疲劳极限", "sigmaHlim2", GearData.sigmaHlim2])
-        ID.writerow(["小轮接触疲劳寿命系数", "KHN1", GearData.KHN1])
-        ID.writerow(["大轮接触疲劳寿命系数", "KHN2", GearData.KHN2])
-        ID.writerow(["使用系数", "KHA", GearData.KHA])
+        if (GearData.GearType != None):
+            ID.writerow(["齿轮类型", "GearType", GearData.GearType])
+        if (GearData.InputPower != None):
+            ID.writerow(["输入功率(KW)", "InputPower", GearData.InputPower])
+        if (GearData.u_ima != None):
+            ID.writerow(["理论齿数比", "u_ima", GearData.u_ima])
+        if (GearData.n1 != None):
+            ID.writerow(["小轮转速(r/min)", "n1", GearData.n1])
+        if (GearData.Lh != None):
+            ID.writerow(["工作寿命(h)", "Lh", GearData.Lh])
+        if (GearData.Level != None):
+            ID.writerow(["齿轮精度等级", "Level", GearData.Level])
+        if (GearData.Material1 != ""):
+            ID.writerow(["小轮材料与热处理方式", "Material1", GearData.Material1])
+        if (GearData.Material2 != ""):
+            ID.writerow(["大轮材料与热处理方式", "Material2", GearData.Material2])
+        if (GearData.G1Hardness != ""):
+            ID.writerow(["小轮硬度", "G1Hardness", GearData.G1Hardness])
+        if (GearData.G2Hardness != ""):
+            ID.writerow(["大轮硬度", "G2Hardness", GearData.G2Hardness])
+        if (GearData.z1_ima != None):
+            ID.writerow(["小轮初选齿数", "z1_ima", GearData.z1_ima])
+        if (GearData.beta_ima != None):
+            ID.writerow(["初选螺旋角", "beta_ima", GearData.beta_ima])
+        if (GearData.KH_test != None):
+            ID.writerow(["试选载荷系数", "KH_test", GearData.KH_test])
+        if (GearData.PHI_d != None):
+            ID.writerow(["齿宽系数", "PHI_d", GearData.PHI_d])
+        if (GearData.ZE != None):
+            ID.writerow(["弹性影响系数", "ZE", GearData.ZE])
+        if (GearData.sigmaHlim1 != None):
+            ID.writerow(["小轮接触疲劳极限", "sigmaHlim1", GearData.sigmaHlim1])
+        if (GearData.sigmaHlim2 != None):
+            ID.writerow(["大轮接触疲劳极限", "sigmaHlim2", GearData.sigmaHlim2])
+        if (GearData.KHN1 != None):
+            ID.writerow(["小轮接触疲劳寿命系数", "KHN1", GearData.KHN1])
+        if (GearData.KHN2 != None):
+            ID.writerow(["大轮接触疲劳寿命系数", "KHN2", GearData.KHN2])
+        if (GearData.KHA != None):
+            ID.writerow(["使用系数", "KHA", GearData.KHA])
         #ID.writerow(["动载系数", "KHV", GearData.KHV])
         #ID.writerow(["齿间载荷分配系数", "KHAlpha", GearData.KHAlpha])
-        ID.writerow(["齿向载荷分布系数", "KHbeta", GearData.KHbeta])
-        ID.writerow(["试选载荷系数", "KF_test", GearData.KF_test])
+        if (GearData.KHbeta != None):
+            ID.writerow(["齿向载荷分布系数", "KHbeta", GearData.KHbeta])
+        if (GearData.KF_test != None):
+            ID.writerow(["试选载荷系数", "KF_test", GearData.KF_test])
         #ID.writerow(["小轮齿形系数", "YFa1", GearData.YFa1])
         #ID.writerow(["小轮应力修正系数", "YSa1", GearData.YSa1])
         #ID.writerow(["大轮齿形系数", "YFa2", GearData.YFa2])
         #ID.writerow(["大轮应力修正系数", "YSa2", GearData.YSa2])
-        ID.writerow(["小轮齿根弯曲疲劳极限", "sigmaFlim1", GearData.sigmaFlim1])
-        ID.writerow(["大轮齿根弯曲疲劳极限", "sigmaFlim2", GearData.sigmaFlim2])
-        ID.writerow(["小轮弯曲疲劳寿命系数", "KFN1", GearData.KFN1])
-        ID.writerow(["大轮弯曲疲劳寿命系数", "KFN2", GearData.KFN2])
-        ID.writerow(["弯曲疲劳安全系数", "SafeF", GearData.SafeF])
+        if (GearData.sigmaFlim1 != None):
+            ID.writerow(["小轮齿根弯曲疲劳极限", "sigmaFlim1", GearData.sigmaFlim1])
+        if (GearData.sigmaFlim2 != None):
+            ID.writerow(["大轮齿根弯曲疲劳极限", "sigmaFlim2", GearData.sigmaFlim2])
+        if (GearData.KFN1 != None):
+            ID.writerow(["小轮弯曲疲劳寿命系数", "KFN1", GearData.KFN1])
+        if (GearData.KFN2 != None):
+            ID.writerow(["大轮弯曲疲劳寿命系数", "KFN2", GearData.KFN2])
+        if (GearData.SafeF != None):
+            ID.writerow(["弯曲疲劳安全系数", "SafeF", GearData.SafeF])
         #ID.writerow(["动载系数", "KFV", GearData.KFV])
         #ID.writerow(["齿间载荷分配系数", "KFalpha", GearData.KFAlpha])
         #ID.writerow(["齿向载荷分布系数", "KFbeta", GearData.KFbeta])
         #ID.writerow(["圆整模数", "m", GearData.m])
-        ID.writerow(["小轮实际齿数", "z1_rel", GearData.z1_rel])
-        ID.writerow(["大轮实际齿数", "z2_rel", GearData.z2_rel])
-        ID.writerow(["小轮轴径", "Axis1_PHI", GearData.Axis1_PHI])
-        ID.writerow(["大轮轴径", "Axis2_PHI", GearData.Axis2_PHI])
+        if (GearData.z1_rel != None):
+            ID.writerow(["小轮实际齿数", "z1_rel", GearData.z1_rel])
+        if (GearData.z2_rel != None):
+            ID.writerow(["大轮实际齿数", "z2_rel", GearData.z2_rel])
+        if (GearData.Axis1_PHI != None):
+            ID.writerow(["小轮轴径", "Axis1_PHI", GearData.Axis1_PHI])
+        if (GearData.Axis2_PHI != None):
+            ID.writerow(["大轮轴径", "Axis2_PHI", GearData.Axis2_PHI])
 
 
 def InputBulkData(fileName):
@@ -770,36 +801,6 @@ def rounding(f):
     return int(Decimal(str(f)).quantize(Decimal('0'), rounding=ROUND_HALF_UP))
 
 
-# 当DataMode为True时,程序会略过所有的输入和查表过程,直接批量读取"InputData.csv"中的预设数据进行计算
-DataMode = Bulk
-
-
-# 检查是否存在批量数据
-def findInputData():
-    if (os.path.exists('InputData.csv') == True):
-        if (SetUpCode("ImprotInputData") == True):
-            InputBulkData('./InputData.csv')
-        else:
-            InputData = input("[提示]检测到批量数据\"InputData\": 是否导入? (Y / N) >>")
-            if ("Y" == InputData or "y" == InputData) and DataMode == True:
-                InputBulkData('./InputData.csv')
-
-
-# 检查是否存在断点数据
-if (os.path.exists('BreakpointData.csv') == True):
-    if (SetUpCode("ImprotBreakpointData") == True):
-        InputBulkData('./BreakpointData.csv')
-    else:
-        InputData = input("[提示]检测到断点数据\"BreakpointData\": 是否导入? (Y / N) >>")
-        if ("Y" == InputData or "y" == InputData):
-            InputBulkData('./BreakpointData.csv')
-        else:
-            os.remove('BreakpointData.csv')  # 删除断点数据
-            findInputData()
-else:
-    findInputData()
-
-
 # 断点堆栈弹出一行
 def BreakpointPop():
     if (os.path.exists('BreakpointData.csv') == True):
@@ -818,13 +819,122 @@ def illegal_input_handler(method: str = 'UpdateCompleted\nImprotBreakpointData')
     os.execl(sys.executable, sys.executable, *sys.argv)  # 重启程序
 
 
+# GearDesignGuide命令提示符帮助
+def GDG_CMDhelp():
+    print("\nCommandPrompt命令:")
+    print("-----------------------------------------------------------------------------------------")
+    print("import <path>                  \t导入齿轮副设计文件        \t例: import ./Gear1.csv")
+    print("save <path>                    \t保存齿轮副设计文件        \t例: save ./Gear1.csv")
+    print("DownloadModule <url> <path>    \t下载GDG模块              \t例: 无")
+    print("exit                           \t退出CommandPrompt")
+
+    print("\n非CommandPrompt命令:")
+    print("-----------------------------------------------------------------------------------------")
+    print("cmd                            \t进入CommandPrompt       \t例: 无")
+    print("pop / back                     \t撤销一次操作             \t例: pop 或 back")
+    print("pop / back <Num>               \t撤销\"Num\"次操作        \t例: pop 2 或 back 2")
+
+# GearDesignGuide命令提示符
+
+
+class CommandPrompt(object):
+    CommandList = []
+
+    def __init__(self, Command: str):
+        # 以空格拆分命令字符串,命令名转为小写
+        self.CommandList = Command.split()
+        self.CommandList[0] = self.CommandList[0].lower()
+
+    # 下载组件
+    def DownloadModule(self):
+        if (self.CommandList[0] == "downloadmodule"):
+            DownloadModule(self.CommandList[1], self.CommandList[2])
+
+    # 保存文件
+    def save(self):
+        if (self.CommandList[0] == "save"):
+            if self.CommandList[1].find('.csv') == -1:
+                WriteInputData(self.CommandList[1]+".csv")
+            else:
+                WriteInputData(self.CommandList[1])
+
+    # 导入文件
+    def Import(self):
+        if (self.CommandList[0] == "import"):
+            if (os.path.exists("./InputData.csv") == True):
+                os.remove("./InputData.csv")
+
+            if (os.path.exists("./BreakpointData.csv") == True):
+                os.remove("./BreakpointData.csv")
+
+            if (os.path.exists(self.CommandList[1]) == True):
+                copy(self.CommandList[1], "./InputData.csv")
+
+            text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotInputData')
+            os.execl(sys.executable, sys.executable, *sys.argv)
+
+    def CommandPrompt(self):
+        # 以命令中参数的多少(包含命令名)对命令进行分类
+        if len(self.CommandList) == 1:
+            pass
+
+        elif len(self.CommandList) == 2:
+            self.save()
+            self.Import()
+
+        elif len(self.CommandList) == 3:
+            self.DownloadModule()
+
+
 # 防火墙,所有输入的数据必须经过这个函数的审查;
 def firewall(Input: str, exc=False):
-    # 如果输入命令"back"或"pop", 则撤销最后一次的操作;
-    if (Input == "back" or Input == "pop" or Input == "BACK" or Input == "POP"):
-        BreakpointPop()
-        text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
-        os.execl(sys.executable, sys.executable, *sys.argv)
+    if (Input == "CommandPrompt" or Input == "commandprompt" or Input == "CMD" or Input == "cmd" or Input == "HELP" or Input == "help"):
+        if (Input == "HELP" or Input == "help"):
+            GDG_CMDhelp()
+            print("")
+
+        while True:
+            Command = input("RMSHE CommandPrompt > ")
+
+            if (Command == "EXIT" or Command == "exit"):
+                with open("BreakpointData.csv", "a", newline='') as csvfile:
+                    BP = csv.writer(csvfile)
+                    BP.writerow(["NULL", "NULL", "NULL"])
+
+                BreakpointPop()
+                text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
+                os.execl(sys.executable, sys.executable, *sys.argv)
+
+            CMP = CommandPrompt(Command)
+            CMP.CommandPrompt()
+
+    # 撤销最后一次的操作;
+    InputList = Input.split()  # 以空格拆分命令字符串
+    InputList[0] = InputList[0].lower()  # 命令名转为小写
+    if (InputList[0] == "back" or InputList[0] == "pop"):
+        # 如果命令仅为 pop,则只弹出一行;
+        if (len(InputList) == 1):
+            BreakpointPop()
+            text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
+            os.execl(sys.executable, sys.executable, *sys.argv)
+
+        # 如果命令仅为 pop <Num>,则弹出多行(不出意外会弹出Num行);
+        elif (len(InputList) == 2):
+            BreakpointDataTotal = sum(1 for line in open('BreakpointData.csv'))  # 获取当前'BreakpointData.csv'文件行数
+
+            # 比较文件行数和命令要求弹出的行数(确保命令弹出的行数不大于文件行数)
+            if int(InputList[1]) > BreakpointDataTotal:
+                popNum = BreakpointDataTotal
+            else:
+                popNum = int(InputList[1])
+
+            for i in range(popNum):
+                BreakpointPop()
+
+            text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        else:
+            pass
 
     if (exc == True):
         return Input
@@ -835,6 +945,35 @@ def firewall(Input: str, exc=False):
 
     return Input
 
+
+# 当DataMode为True时,程序会略过所有的输入和查表过程,直接批量读取"InputData.csv"中的预设数据进行计算
+DataMode = Bulk
+
+
+# 检查是否存在批量数据
+def findInputData():
+    if (os.path.exists('InputData.csv') == True):
+        if (SetUpCode("ImprotInputData") == True):
+            InputBulkData('./InputData.csv')
+        else:
+            InputData = firewall(input("[提示]检测到批量数据\"InputData\": 是否导入? (Y / N) >>"), exc=True)
+            if ("Y" == InputData or "y" == InputData) and DataMode == True:
+                InputBulkData('./InputData.csv')
+
+
+# 检查是否存在断点数据
+if (os.path.exists('BreakpointData.csv') == True):
+    if (SetUpCode("ImprotBreakpointData") == True):
+        InputBulkData('./BreakpointData.csv')
+    else:
+        InputData = firewall(input("[提示]检测到断点数据\"BreakpointData\": 是否导入? (Y / N) >>"), exc=True)
+        if ("Y" == InputData or "y" == InputData):
+            InputBulkData('./BreakpointData.csv')
+        else:
+            os.remove('BreakpointData.csv')  # 删除断点数据
+            findInputData()
+else:
+    findInputData()
 
 if (DataMode == False or GearData.GearType == None):
     GearData.GearType = eval(firewall(input("\n请确定设计的齿轮类型(直齿轮:0 / 斜齿轮:1): ")))
@@ -1770,6 +1909,9 @@ elif (ReportMode == "D" or ReportMode == "d"):
 else:
     illegal_input_handler('UpdateCompleted\nImprotInputData')
 
+while True:
+    CMP = CommandPrompt(input("RMSHE GearDesignGuideCommand > "))
+    CMP.CommandPrompt()
 
 os.system("pause")
 
