@@ -21,12 +21,14 @@
 # 渐开线圆柱直齿轮副优化设计计算向导
 # Powered by RMSHE / 2022.10.18
 # Python 3.9.13 64-bit
+import os.path
 from ast import Str
 from ctypes import *
 from decimal import *
 from math import *
 from time import sleep
 from shutil import copy
+from tabulate import tabulate
 #from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 import csv
 import re
@@ -168,7 +170,7 @@ def Module_Self_Test(file_name: str, file_path: str):
         sys.exit()
 
 
-# 复制安装文件(a -> b)
+# 剪切安装文件(a -> b)
 def CopyInstallFile(a_path, b_path):
     # 如果新版文件存在则执行复制操作(更新)
     if (os.path.exists(a_path) == True):
@@ -236,7 +238,8 @@ for name in Resource:
     Module_Self_Test(name, f"./Resource/{name}")
 """
 
-MathDll = CDLL("./GearDesignGuide.dll")
+DllAbsPath = '\\'.join(sys.executable.split("\\")[0:-1])+"\\GearDesignGuide.dll"
+MathDll = CDLL(DllAbsPath)
 if (MathDll.SelfTest(114514) != 114514):
     print("[致命错误]GearDesignGuide.dll未响应,核心组件可能已损坏.")
     #QMessageBox.critical(window, '致命错误', 'GearDesignGuide.dll未响应,核心组件可能已损坏.')
@@ -249,7 +252,7 @@ if (MathDll.SelfTest(114514) != 114514):
 if (SetUpCode("ImprotBreakpointData") == False and SetUpCode("ImprotInputData") == False):
     os.system("cls")
     MathDll.DllInfo()
-    print("[版本信息] GearDesignGuide - Beta.2022.10.31.Mark0 - 斜齿轮设计&断点备份&输入撤销&自动更新机制大改&命令提示符;")
+    print("[版本信息] GearDesignGuide - Dev.2022.11.6.Mark0 - 斜齿轮设计&断点备份&输入撤销&自动更新机制大改&命令提示符;")
     print("[更新提示] CommandPrompt上线, 键入\"help\"查看所有命令.\n")
 
 Point = False  # 所有的数据按向导导引手动查表输入
@@ -801,6 +804,11 @@ def rounding(f):
     return int(Decimal(str(f)).quantize(Decimal('0'), rounding=ROUND_HALF_UP))
 
 
+def Restart(startup_parameters: str = ""):
+    text_create('./GDGSetUp.ini', startup_parameters)  # 写入启动参数
+    os.execl(sys.executable, sys.executable, *sys.argv)  # 重启程序
+
+
 # 断点堆栈弹出一行
 def BreakpointPop():
     if (os.path.exists('BreakpointData.csv') == True):
@@ -815,28 +823,30 @@ def BreakpointPop():
 # 非法输入处理器(处理方式)
 def illegal_input_handler(method: str = 'UpdateCompleted\nImprotBreakpointData'):
     print("[警告]非法字符,请重新键入该值.")
-    text_create('./GDGSetUp.ini', method)
-    os.execl(sys.executable, sys.executable, *sys.argv)  # 重启程序
+    Restart(method)
 
 
 # GearDesignGuide命令提示符帮助
 def GDG_CMDhelp():
-    print("\nCommandPrompt命令:")
-    print("-----------------------------------------------------------------------------------------")
-    print("import <path>                  \t导入齿轮副设计文件        \t例: import ./Gear1.csv")
-    print("save <path>                    \t保存齿轮副设计文件        \t例: save ./Gear1.csv")
-    print("DownloadModule <url> <path>    \t下载GDG模块              \t例: 无")
-    print("exit                           \t退出CommandPrompt")
+    CMD = [['CommandPrompt', 'Explanation', 'Example'],
+           ['import <path>', 'Import gear pair design files', 'mport ./Gear1.csv'],
+           ['save <path>', 'Save gear pair design files', 'save ./Gear1.csv'],
+           ['DownloadModule <url> <path>', 'Download GDG Module', ''],
+           ['exit', 'Exit CommandPrompt', ''],
+           ['rest', 'Restart(No Parameters)', 'rest'],
+           ['rest <parameter>', 'Restart(With Parameters)', 'rest ImprotBreakpointData'],
+           ['reinstall', 'Re-install GearDesignGuide', 'reinstall']]
 
-    print("\n非CommandPrompt命令:")
-    print("-----------------------------------------------------------------------------------------")
-    print("cmd                            \t进入CommandPrompt       \t例: 无")
-    print("pop / back                     \t撤销一次操作             \t例: pop 或 back")
-    print("pop / back <Num>               \t撤销\"Num\"次操作        \t例: pop 2 或 back 2")
+    NOTCMD = [['NotCommandPrompt', 'Explanation', 'Example'],
+              ['cmd', 'Enter CommandPrompt', 'cmd'],
+              ['pop / back', 'Undo an action', 'pop or back'],
+              ['pop / back <Num>', 'Undo \"Num\" actions', 'pop 2 or back 2']]
+
+    print(tabulate(CMD, headers='firstrow', tablefmt='fancy_grid', showindex=True))
+    print(tabulate(NOTCMD, headers='firstrow', tablefmt='fancy_grid', showindex=True))
+
 
 # GearDesignGuide命令提示符
-
-
 class CommandPrompt(object):
     CommandList = []
 
@@ -861,22 +871,44 @@ class CommandPrompt(object):
     # 导入文件
     def Import(self):
         if (self.CommandList[0] == "import"):
+            # 删除旧的"InputData.csv"文件
             if (os.path.exists("./InputData.csv") == True):
                 os.remove("./InputData.csv")
 
+            # 删除"BreakpointData.csv"断点数据
             if (os.path.exists("./BreakpointData.csv") == True):
                 os.remove("./BreakpointData.csv")
 
+            # 复制要导入的文件
             if (os.path.exists(self.CommandList[1]) == True):
-                copy(self.CommandList[1], "./InputData.csv")
+                if (self.CommandList[1] != "./InputData.csv" or self.CommandList[1] != "InputData.csv"):
+                    copy(self.CommandList[1], "./InputData.csv")  # 拷贝并重命名要导入文件
 
-            text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotInputData')
-            os.execl(sys.executable, sys.executable, *sys.argv)
+            Restart('UpdateCompleted\nImprotInputData')  # 重新启动
+
+    # 重新启动
+    def restart(self):
+        if (self.CommandList[0] == "rest" or self.CommandList[0] == "restart"):
+            if len(self.CommandList) == 1:
+                Restart('UpdateCompleted')
+            if len(self.CommandList) == 2:
+                Restart(self.CommandList[1])
+
+    # 重新安装GearDesignGuide
+    def Reinstall(self):
+        if (self.CommandList[0] == "reinstall"):
+            # 删除"BreakpointData.csv"断点数据
+            if (os.path.exists("./GDGUpDateInfo.ini") == True):
+                os.remove("./GDGUpDateInfo.ini")
+            Restart()
 
     def CommandPrompt(self):
+        # 不以命令中参数的多少(包含命令名)分类的命令
+        self.restart()
+
         # 以命令中参数的多少(包含命令名)对命令进行分类
         if len(self.CommandList) == 1:
-            pass
+            self.Reinstall()
 
         elif len(self.CommandList) == 2:
             self.save()
@@ -902,8 +934,7 @@ def firewall(Input: str, exc=False):
                     BP.writerow(["NULL", "NULL", "NULL"])
 
                 BreakpointPop()
-                text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
-                os.execl(sys.executable, sys.executable, *sys.argv)
+                Restart('UpdateCompleted\nImprotBreakpointData')
 
             CMP = CommandPrompt(Command)
             CMP.CommandPrompt()
@@ -931,8 +962,7 @@ def firewall(Input: str, exc=False):
             for i in range(popNum):
                 BreakpointPop()
 
-            text_create('./GDGSetUp.ini', 'UpdateCompleted\nImprotBreakpointData')
-            os.execl(sys.executable, sys.executable, *sys.argv)
+            Restart('UpdateCompleted\nImprotBreakpointData')
         else:
             pass
 
