@@ -1765,10 +1765,23 @@ def GearOtherGeo(z, m):
     hf = 1.25*m
     # 全齿高
     h = ha+hf
-    # 齿顶圆直径
-    da = (z+2)*m
-    # 齿根圆直径
-    df = (z-2.5)*m
+
+    # 计算直齿轮齿顶圆和齿根圆直径
+    if (GearData.GearType == 0):
+        # 齿顶圆直径
+        da = (z+2)*m
+        # 齿根圆直径
+        df = (z-2.5)*m
+
+    # 计算斜齿轮齿顶圆和齿根圆直径
+    if (GearData.GearType == 1):
+        # 计算分度圆直径
+        d = (GearData.z1_rel*GearData.m)/cos(GearData.beta_ima*pi/180)
+        # 齿顶圆直径
+        da = d+2*ha
+        # 齿根圆直径
+        df = d-2*hf
+
     # 齿厚
     s = z*m*sin((pi/180*90 / z))
 
